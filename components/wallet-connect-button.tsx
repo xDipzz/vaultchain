@@ -36,28 +36,34 @@ export function WalletConnectButton({ size = "md", className = "", onConnect, re
 
       console.log('Attempting to connect to wallet:', walletName)
 
-      // Wait for the wallet to be properly selected
-      let attempts = 0
-      const maxAttempts = 10
-
-      while (!wallet && attempts < maxAttempts) {
-        await new Promise((resolve) => setTimeout(resolve, 100))
-        attempts++
-      }
-
-      if (!wallet) {
-        throw new Error("Wallet selection failed")
-      }
+      // Instead of waiting for wallet state, directly try to connect
+      // The select() function in WalletModal already selected the wallet
+      // Let's give it a moment to initialize properly
+      await new Promise((resolve) => setTimeout(resolve, 300))
 
       console.log('Wallet selected, attempting connection...')
 
-      // Now attempt to connect
-      await connect()
-
-      console.log('Wallet connection successful!')
+      // Retry connection with better error handling
+      let retryCount = 0
+      const maxRetries = 2
+      
+      while (retryCount <= maxRetries) {
+        try {
+          await connect()
+          console.log('Wallet connection successful!')
+          break
+        } catch (connectionError) {
+          retryCount++
+          if (retryCount > maxRetries) {
+            throw connectionError
+          }
+          console.log(`Connection attempt ${retryCount} failed, retrying...`)
+          await new Promise((resolve) => setTimeout(resolve, 500))
+        }
+      }
 
       // Wait a bit for connection to fully establish
-      await new Promise((resolve) => setTimeout(resolve, 500))
+      await new Promise((resolve) => setTimeout(resolve, 300))
 
       if (onConnect) {
         onConnect()

@@ -25,8 +25,8 @@ export function WalletModal({ open, onClose, onWalletSelected }: WalletModalProp
       
       select(walletName)
 
-      // Wait a bit for the selection to process
-      await new Promise((resolve) => setTimeout(resolve, 200))
+      // Wait longer for the selection to properly process
+      await new Promise((resolve) => setTimeout(resolve, 400))
 
       console.log('Wallet selected, calling onWalletSelected')
       onWalletSelected(walletName)
