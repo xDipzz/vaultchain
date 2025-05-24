@@ -4,6 +4,8 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { ArrowLeft, ArrowRight, CheckCircle, Shield, Users } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
+import { useWallet } from "@solana/wallet-adapter-react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -20,9 +22,22 @@ interface Guardian {
   isValid: boolean
 }
 
+// Animation variants
+const stepVariants = {
+  hidden: { opacity: 0, x: 50 },
+  visible: { opacity: 1, x: 0 },
+  exit: { opacity: 0, x: -50 }
+}
+
+const fadeInUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 }
+}
+
 export default function SetupRecoveryPage() {
   const router = useRouter()
-  const { connected, publicKey } = useSolana()
+  const { connected, publicKey } = useWallet()
+  const { service } = useSolana()
   const [currentStep, setCurrentStep] = useState("step1")
   const [isDeploying, setIsDeploying] = useState(false)
   
@@ -182,7 +197,7 @@ export default function SetupRecoveryPage() {
                   <Label htmlFor="wallet-address">Your Wallet Address</Label>
                   <Input 
                     id="wallet-address" 
-                    value={publicKey ? `${publicKey.slice(0, 8)}...${publicKey.slice(-8)}` : ""} 
+                    value={publicKey ? `${publicKey.toString().slice(0, 8)}...${publicKey.toString().slice(-8)}` : ""} 
                     readOnly 
                   />
                   <p className="text-xs text-muted-foreground">This is the wallet that will be protected.</p>
@@ -361,7 +376,7 @@ export default function SetupRecoveryPage() {
                     <h4 className="font-medium">Wallet Details</h4>
                     <div className="grid grid-cols-2 gap-2 text-sm">
                       <div className="text-muted-foreground">Protected Wallet:</div>
-                      <div>{publicKey ? `${publicKey.slice(0, 8)}...${publicKey.slice(-8)}` : ""}</div>
+                      <div>{publicKey ? `${publicKey.toString().slice(0, 8)}...${publicKey.toString().slice(-8)}` : ""}</div>
                       <div className="text-muted-foreground">Recovery Name:</div>
                       <div>{recoveryName}</div>
                     </div>

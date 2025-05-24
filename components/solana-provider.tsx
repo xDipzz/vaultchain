@@ -7,8 +7,6 @@ import { WalletModalProvider } from '@solana/wallet-adapter-react-ui'
 import {
   PhantomWalletAdapter,
   SolflareWalletAdapter,
-  TorusWalletAdapter,
-  LedgerWalletAdapter,
 } from '@solana/wallet-adapter-wallets'
 import { clusterApiUrl, Connection, LAMPORTS_PER_SOL } from '@solana/web3.js'
 import { solanaService, SolanaService } from '@/lib/solana-service'
@@ -21,8 +19,6 @@ const endpoint = process.env.NEXT_PUBLIC_SOLANA_RPC_URL || clusterApiUrl(network
 const wallets = [
   new PhantomWalletAdapter(),
   new SolflareWalletAdapter(),
-  new TorusWalletAdapter(),
-  new LedgerWalletAdapter(),
 ]
 
 interface SolanaContextType {

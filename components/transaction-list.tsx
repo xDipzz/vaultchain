@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react"
 import { ArrowDownLeft, ArrowUpRight, RefreshCw } from "lucide-react"
 import { Connection, PublicKey, clusterApiUrl } from "@solana/web3.js"
+import { useWallet } from "@solana/wallet-adapter-react"
 
 import { cn } from "@/lib/utils"
-import { useSolana } from "@/components/solana-provider"
 
 interface Transaction {
   id: string
@@ -18,7 +18,7 @@ interface Transaction {
 }
 
 export function TransactionList() {
-  const { connected, publicKey } = useSolana()
+  const { connected, publicKey } = useWallet()
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -36,10 +36,9 @@ export function TransactionList() {
 
       try {
         const connection = new Connection(clusterApiUrl('devnet'))
-        const pubKey = new PublicKey(publicKey)
         
         // Fetch recent transaction signatures
-        const signatures = await connection.getSignaturesForAddress(pubKey, { limit: 5 })
+        const signatures = await connection.getSignaturesForAddress(publicKey, { limit: 5 })
         
         if (signatures.length === 0) {
           setTransactions([])
