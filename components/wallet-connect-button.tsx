@@ -5,7 +5,6 @@ import { useWallet } from "@solana/wallet-adapter-react"
 import type { WalletName } from "@solana/wallet-adapter-base"
 import { useRouter } from "next/navigation"
 
-import { useSolana } from "@/components/solana-provider"
 import { WalletModal } from "@/components/wallet-modal"
 import { cn } from "@/lib/utils"
 
@@ -17,8 +16,7 @@ interface WalletConnectButtonProps {
 }
 
 export function WalletConnectButton({ size = "md", className = "", onConnect, redirectToDashboard = false }: WalletConnectButtonProps) {
-  const { connected, connecting } = useSolana()
-  const { wallet, connect } = useWallet()
+  const { connected, connecting, wallet, connect } = useWallet()
   const router = useRouter()
   const [showWalletModal, setShowWalletModal] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -30,10 +28,13 @@ export function WalletConnectButton({ size = "md", className = "", onConnect, re
     setShowWalletModal(true)
   }
 
-  const handleWalletSelected = async (_walletName: WalletName) => {
+  const handleWalletSelected = async (walletName: WalletName) => {
     try {
       setIsConnecting(true)
       setError(null)
+      setShowWalletModal(false) // Close modal immediately
+
+      console.log('Attempting to connect to wallet:', walletName)
 
       // Wait for the wallet to be properly selected
       let attempts = 0
@@ -48,8 +49,12 @@ export function WalletConnectButton({ size = "md", className = "", onConnect, re
         throw new Error("Wallet selection failed")
       }
 
+      console.log('Wallet selected, attempting connection...')
+
       // Now attempt to connect
       await connect()
+
+      console.log('Wallet connection successful!')
 
       // Wait a bit for connection to fully establish
       await new Promise((resolve) => setTimeout(resolve, 500))
@@ -64,7 +69,7 @@ export function WalletConnectButton({ size = "md", className = "", onConnect, re
       }
     } catch (err) {
       console.error("Connection error:", err)
-      setError("Failed to connect wallet. Please try again.")
+      setError(`Failed to connect wallet: ${err instanceof Error ? err.message : 'Unknown error'}`)
     } finally {
       setIsConnecting(false)
     }

@@ -1,6 +1,6 @@
 "use client"
 
-import React, { createContext, useContext, useEffect, useState } from 'react'
+import React, { createContext, useContext, useEffect, useState, useMemo } from 'react'
 import { ConnectionProvider, WalletProvider, useWallet } from '@solana/wallet-adapter-react'
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base'
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui'
@@ -15,11 +15,6 @@ require('@solana/wallet-adapter-react-ui/styles.css')
 
 const network = WalletAdapterNetwork.Devnet
 const endpoint = process.env.NEXT_PUBLIC_SOLANA_RPC_URL || clusterApiUrl(network)
-
-const wallets = [
-  new PhantomWalletAdapter(),
-  new SolflareWalletAdapter(),
-]
 
 interface SolanaContextType {
   balance: number
@@ -70,6 +65,16 @@ function SolanaServiceProvider({ children }: { children: React.ReactNode }) {
     refreshBalance()
   }, [wallet.publicKey, wallet.connected])
 
+  // Debug wallet state changes
+  useEffect(() => {
+    console.log('Wallet state changed:', {
+      connected: wallet.connected,
+      connecting: wallet.connecting,
+      publicKey: wallet.publicKey?.toString(),
+      wallet: wallet.wallet?.adapter.name
+    })
+  }, [wallet.connected, wallet.connecting, wallet.publicKey, wallet.wallet])
+
   return (
     <SolanaContext.Provider value={{ balance, loading, service: solanaService, refreshBalance }}>
       {children}
@@ -78,9 +83,24 @@ function SolanaServiceProvider({ children }: { children: React.ReactNode }) {
 }
 
 export function SolanaProvider({ children }: { children: React.ReactNode }) {
+  // Use useMemo to prevent recreating wallets on every render
+  const wallets = useMemo(
+    () => [
+      new PhantomWalletAdapter(),
+      new SolflareWalletAdapter(),
+    ],
+    []
+  )
+
   return (
     <ConnectionProvider endpoint={endpoint}>
-      <WalletProvider wallets={wallets} autoConnect>
+      <WalletProvider 
+        wallets={wallets} 
+        autoConnect={false}
+        onError={(error) => {
+          console.error('Wallet error:', error)
+        }}
+      >
         <WalletModalProvider>
           <SolanaServiceProvider>
             {children}

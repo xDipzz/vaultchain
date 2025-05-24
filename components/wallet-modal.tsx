@@ -21,11 +21,14 @@ export function WalletModal({ open, onClose, onWalletSelected }: WalletModalProp
   const handleWalletSelect = async (walletName: WalletName) => {
     try {
       setSelecting(walletName)
+      console.log('Selecting wallet:', walletName)
+      
       select(walletName)
 
       // Wait a bit for the selection to process
       await new Promise((resolve) => setTimeout(resolve, 200))
 
+      console.log('Wallet selected, calling onWalletSelected')
       onWalletSelected(walletName)
       onClose()
     } catch (error) {
