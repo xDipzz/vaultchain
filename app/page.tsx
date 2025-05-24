@@ -14,11 +14,13 @@ import { ScrollReveal } from "@/components/scroll-reveal"
 import { Logo } from "@/components/logo"
 import { useSolana } from "@/components/solana-provider"
 import { WalletConnectButton } from "@/components/wallet-connect-button"
+import { WarningPopup, useWarningPopup } from "@/components/warning-popup"
 
 export default function LandingPage() {
   const { connect, connected, publicKey, balance } = useSolana()
   const [isRedirecting, setIsRedirecting] = useState(false)
   const [showDemo, setShowDemo] = useState(false)
+  const { showWarning, closeWarning } = useWarningPopup()
 
   const handleProtectWallet = async () => {
     if (!connected) {
@@ -48,36 +50,50 @@ export default function LandingPage() {
           </div>
           <h2 className="text-3xl font-bold text-white">VaultChain Demo</h2>
           <p className="text-neutral-400">
-            To see how VaultChain works with real data, connect your Solana wallet and explore the live dashboard.
+            Watch how VaultChain works and explore the concept of social recovery for Solana wallets.
           </p>
+          
+          {/* Important Notice */}
+          <div className="p-4 bg-yellow-900/20 border border-yellow-700/50 rounded-lg">
+            <p className="text-yellow-300 text-sm">
+              ⚠️ VaultChain is currently in the building phase. Please only experiment with small amounts you can afford to lose. This is an educational project and not production-ready software.
+            </p>
+          </div>
           
           {/* Demo Features */}
           <div className="grid gap-4 text-left">
             <div className="flex items-start gap-3 p-4 bg-neutral-800/50 rounded-lg">
               <Wallet className="w-5 h-5 text-purple-400 mt-0.5" />
               <div>
-                <h4 className="font-semibold text-white">Real Wallet Protection</h4>
-                <p className="text-sm text-neutral-400">Set up recovery for your actual Phantom or Solflare wallet</p>
+                <h4 className="font-semibold text-white">Smart Contract Wallet</h4>
+                <p className="text-sm text-neutral-400">See how social recovery is built into the wallet contract</p>
               </div>
             </div>
             <div className="flex items-start gap-3 p-4 bg-neutral-800/50 rounded-lg">
               <Users className="w-5 h-5 text-blue-400 mt-0.5" />
               <div>
-                <h4 className="font-semibold text-white">Live Guardian System</h4>
-                <p className="text-sm text-neutral-400">Add real guardians and see the recovery process in action</p>
+                <h4 className="font-semibold text-white">Guardian System</h4>
+                <p className="text-sm text-neutral-400">Learn how trusted people can help you recover access</p>
               </div>
             </div>
             <div className="flex items-start gap-3 p-4 bg-neutral-800/50 rounded-lg">
               <Clock className="w-5 h-5 text-green-400 mt-0.5" />
               <div>
-                <h4 className="font-semibold text-white">Actual Check-ins</h4>
-                <p className="text-sm text-neutral-400">Perform real check-ins to keep your wallet protected</p>
+                <h4 className="font-semibold text-white">Recovery Process</h4>
+                <p className="text-sm text-neutral-400">Understand the safety mechanisms and timeouts</p>
               </div>
             </div>
           </div>
           
           <div className="flex flex-col sm:flex-row gap-4">
-            <WalletConnectButton size="lg" redirectToDashboard={true} />
+            <SophisticatedButton 
+              size="lg"
+              onClick={() => {
+                window.open('https://www.loom.com/share/82aab90664f64577bab8ae830d04a056?sid=a56a40f1-25cb-4d06-aa37-32d9ee2760c4', '_blank')
+              }}
+            >
+              Watch How It Works
+            </SophisticatedButton>
             <SophisticatedButton 
               variant="secondary" 
               size="lg"
@@ -1060,11 +1076,11 @@ export default function LandingPage() {
             <div className="flex flex-col sm:flex-row items-center gap-4 text-sm text-muted-foreground">
               <p>&copy; {new Date().getFullYear()} VaultChain. All rights reserved.</p>
               <div className="flex items-center gap-4">
-                <Link href="#" className="hover:text-foreground transition-colors">
-                  Privacy Policy
+                <Link href="/terms" className="hover:text-foreground transition-colors">
+                  Terms of Service
                 </Link>
                 <Link href="#" className="hover:text-foreground transition-colors">
-                  Terms of Service
+                  Privacy Policy
                 </Link>
               </div>
             </div>
@@ -1080,6 +1096,7 @@ export default function LandingPage() {
       </footer>
 
       {showDemo && <DemoModal />}
+      <WarningPopup show={showWarning} onClose={closeWarning} />
     </div>
   )
 }
