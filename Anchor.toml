@@ -3,9 +3,9 @@ seeds = false
 skip-lint = false
 
 [programs.devnet]
-recovery = "11111111111111111111111111111111"
-guardian = "11111111111111111111111111111111"
-checkin = "11111111111111111111111111111111"
+recovery = "recSnKaWtBYGCSPEu3PmeQZbEa6cqaRjTMoqgofFcAm"
+guardian = "grdkf4ikMWzZHZahCJsnZkpxW86VRPGejEBeTv4eAPd"
+checkin = "chk4w69XLVVe4WHZhXtqvtUttfTqxRyPdVgW838DzNa"
 
 [registry]
 url = "https://api.apr.dev"

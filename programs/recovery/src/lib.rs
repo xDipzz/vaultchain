@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-declare_id!("YourProgramIDHere"); // Replace with your program ID
+declare_id!("recSnKaWtBYGCSPEu3PmeQZbEa6cqaRjTMoqgofFcAm");
 
 #[program]
 pub mod recovery {

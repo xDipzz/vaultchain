@@ -1,114 +1,96 @@
 "use client"
 
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react"
-import { ConnectionProvider, WalletProvider, useWallet as useSolanaWallet } from "@solana/wallet-adapter-react"
-import { WalletAdapterNetwork } from "@solana/wallet-adapter-base"
-import { PhantomWalletAdapter, SolflareWalletAdapter } from "@solana/wallet-adapter-wallets"
-import { clusterApiUrl, Connection, LAMPORTS_PER_SOL } from "@solana/web3.js"
+import React, { createContext, useContext, useEffect, useState } from 'react'
+import { ConnectionProvider, WalletProvider, useWallet } from '@solana/wallet-adapter-react'
+import { WalletAdapterNetwork } from '@solana/wallet-adapter-base'
+import { WalletModalProvider } from '@solana/wallet-adapter-react-ui'
+import {
+  PhantomWalletAdapter,
+  SolflareWalletAdapter,
+  TorusWalletAdapter,
+  LedgerWalletAdapter,
+} from '@solana/wallet-adapter-wallets'
+import { clusterApiUrl, Connection, LAMPORTS_PER_SOL } from '@solana/web3.js'
+import { solanaService, SolanaService } from '@/lib/solana-service'
+
+require('@solana/wallet-adapter-react-ui/styles.css')
+
+const network = WalletAdapterNetwork.Devnet
+const endpoint = process.env.NEXT_PUBLIC_SOLANA_RPC_URL || clusterApiUrl(network)
+
+const wallets = [
+  new PhantomWalletAdapter(),
+  new SolflareWalletAdapter(),
+  new TorusWalletAdapter(),
+  new LedgerWalletAdapter(),
+]
 
 interface SolanaContextType {
-  connected: boolean
-  connecting: boolean
-  publicKey: string | null
-  walletName: string | null
-  network: string
-  balance: number | null
-  connect: () => Promise<void>
-  disconnect: () => Promise<void>
+  balance: number
+  loading: boolean
+  service: SolanaService
+  refreshBalance: () => Promise<void>
 }
 
 const SolanaContext = createContext<SolanaContextType>({
-  connected: false,
-  connecting: false,
-  publicKey: null,
-  walletName: null,
-  network: "devnet",
-  balance: null,
-  connect: async () => {},
-  disconnect: async () => {},
+  balance: 0,
+  loading: false,
+  service: solanaService,
+  refreshBalance: async () => {},
 })
 
 export const useSolana = () => useContext(SolanaContext)
 
-export function SolanaProvider({ children }: { children: ReactNode }) {
-  // You can change this to mainnet-beta, devnet, or testnet
-  const network = WalletAdapterNetwork.Devnet
-  const endpoint = useMemo(() => clusterApiUrl(network), [network])
+function SolanaServiceProvider({ children }: { children: React.ReactNode }) {
+  const wallet = useWallet()
+  const [balance, setBalance] = useState(0)
+  const [loading, setLoading] = useState(false)
 
-  const wallets = useMemo(() => [new PhantomWalletAdapter(), new SolflareWalletAdapter()], [])
+  const refreshBalance = async () => {
+    if (!wallet.publicKey) {
+      setBalance(0)
+      return
+    }
+
+    setLoading(true)
+    try {
+      const newBalance = await solanaService.getBalance(wallet.publicKey)
+      setBalance(newBalance)
+    } catch (error) {
+      console.error('Error fetching balance:', error)
+      setBalance(0)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    // Set up the service provider when wallet changes
+    if (wallet.publicKey && wallet.signTransaction) {
+      solanaService.setProvider(wallet)
+    }
+    
+    // Refresh balance when wallet connects/disconnects
+    refreshBalance()
+  }, [wallet.publicKey, wallet.connected])
 
   return (
-    <ConnectionProvider endpoint={endpoint}>
-      <WalletProvider wallets={wallets} autoConnect={true}>
-        <SolanaContextWrapper networkName={network}>{children}</SolanaContextWrapper>
-      </WalletProvider>
-    </ConnectionProvider>
+    <SolanaContext.Provider value={{ balance, loading, service: solanaService, refreshBalance }}>
+      {children}
+    </SolanaContext.Provider>
   )
 }
 
-function SolanaContextWrapper({ children, networkName }: { children: ReactNode; networkName: string }) {
-  const { publicKey, connected, connecting, wallet, connect, disconnect } = useSolanaWallet()
-  const [balance, setBalance] = useState<number | null>(null)
-  
-  // Create connection instance
-  const connection = useMemo(() => new Connection(clusterApiUrl(networkName as WalletAdapterNetwork)), [networkName])
-
-  // Format network name for display
-  const formattedNetwork =
-    networkName === WalletAdapterNetwork.Devnet
-      ? "Devnet"
-      : networkName === WalletAdapterNetwork.Mainnet
-        ? "Mainnet"
-        : "Testnet"
-
-  // Fetch real balance from Solana blockchain
-  useEffect(() => {
-    const fetchBalance = async () => {
-      if (connected && publicKey) {
-        try {
-          const balanceInLamports = await connection.getBalance(publicKey)
-          const balanceInSol = balanceInLamports / LAMPORTS_PER_SOL
-          setBalance(balanceInSol)
-        } catch (error) {
-          console.error("Failed to fetch balance:", error)
-          setBalance(0) // Set to 0 if fetch fails
-        }
-      } else {
-        setBalance(null)
-      }
-    }
-
-    fetchBalance()
-  }, [connected, publicKey, connection])
-
-  const value = {
-    connected,
-    connecting,
-    publicKey: publicKey ? publicKey.toString() : null,
-    walletName: wallet?.adapter.name || null,
-    network: formattedNetwork,
-    balance,
-    connect: async () => {
-      try {
-        if (!wallet) {
-          throw new Error("No wallet selected. Please select a wallet first.")
-        }
-
-        // The wallet should already be selected by the WalletModal
-        await connect()
-      } catch (error) {
-        console.error("Failed to connect wallet:", error)
-        throw error
-      }
-    },
-    disconnect: async () => {
-      try {
-        await disconnect()
-      } catch (error) {
-        console.error("Failed to disconnect wallet:", error)
-      }
-    },
-  }
-
-  return <SolanaContext.Provider value={value}>{children}</SolanaContext.Provider>
+export function SolanaProvider({ children }: { children: React.ReactNode }) {
+  return (
+    <ConnectionProvider endpoint={endpoint}>
+      <WalletProvider wallets={wallets} autoConnect>
+        <WalletModalProvider>
+          <SolanaServiceProvider>
+            {children}
+          </SolanaServiceProvider>
+        </WalletModalProvider>
+      </WalletProvider>
+    </ConnectionProvider>
+  )
 }
