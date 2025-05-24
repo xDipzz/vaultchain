@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { ArrowRight, Shield, Users, Lock, CheckCircle, Zap, Globe, Eye, RefreshCw } from "lucide-react"
+import { ArrowRight, Shield, Users, Lock, CheckCircle, Zap, Globe, Eye, RefreshCw, Clock, Wallet } from "lucide-react"
 import { motion } from "framer-motion"
 import { useState } from "react"
 
@@ -103,9 +103,11 @@ export default function LandingPage() {
                   ) : (
                     <WalletConnectButton size="lg" onConnect={() => (window.location.href = "/dashboard")} />
                   )}
-                  <SophisticatedButton variant="secondary" size="lg">
-                    See How It Works
-                  </SophisticatedButton>
+                  <a href="#features">
+                    <SophisticatedButton variant="secondary" size="lg">
+                      See How It Works
+                    </SophisticatedButton>
+                  </a>
                 </motion.div>
               </motion.div>
 
@@ -475,6 +477,283 @@ export default function LandingPage() {
                       <h3 className="font-semibold text-white">{feature.title}</h3>
                       <p className="text-sm text-neutral-400 leading-relaxed">{feature.description}</p>
                     </div>
+                  </ElegantCard>
+                </ScrollReveal>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Security Section */}
+        <section id="security" className="py-24 px-6">
+          <div className="container mx-auto max-w-6xl">
+            <ScrollReveal>
+              <div className="text-center space-y-6 mb-16">
+                <motion.div
+                  className="inline-flex items-center px-4 py-2 rounded-full bg-green-900/20 border border-green-800/30 text-sm text-green-300"
+                  whileInView={{ opacity: 1, y: 0 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  transition={{ duration: 0.6 }}
+                >
+                  <Shield className="w-4 h-4 mr-2" />
+                  Security First
+                </motion.div>
+                <h2 className="text-4xl lg:text-6xl font-bold">
+                  <span className="text-white">Bank-Grade</span>
+                  <br />
+                  <span className="bg-gradient-to-r from-green-400 via-green-300 to-green-500 bg-clip-text text-transparent">
+                    Security
+                  </span>
+                </h2>
+                <p className="text-xl text-neutral-400 max-w-3xl mx-auto leading-relaxed">
+                  VaultChain uses audited Solana programs and multi-signature authentication to protect your assets.
+                </p>
+              </div>
+            </ScrollReveal>
+
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+              <ScrollReveal>
+                <div className="space-y-8">
+                  {[
+                    {
+                      title: "Audited Solana Programs",
+                      description: "All our smart contracts have been independently audited by top security firms.",
+                      icon: Shield,
+                    },
+                    {
+                      title: "Multi-Signature Protection",
+                      description: "Requires multiple guardian approvals before any recovery action can be executed.",
+                      icon: Users,
+                    },
+                    {
+                      title: "Time-Locked Recovery",
+                      description: "Built-in delays give you time to cancel malicious recovery attempts.",
+                      icon: Clock,
+                    },
+                    {
+                      title: "Non-Custodial Design",
+                      description: "VaultChain never holds your private keys or has access to your funds.",
+                      icon: Lock,
+                    },
+                  ].map((item, index) => (
+                    <motion.div
+                      key={index}
+                      className="flex items-start space-x-4"
+                      initial={{ opacity: 0, x: -20 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.5, delay: index * 0.1 }}
+                    >
+                      <div className="w-12 h-12 bg-gradient-to-br from-green-600 to-green-700 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <item.icon className="w-6 h-6 text-white" />
+                      </div>
+                      <div className="space-y-2">
+                        <h3 className="text-xl font-semibold text-white">{item.title}</h3>
+                        <p className="text-neutral-400 leading-relaxed">{item.description}</p>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </ScrollReveal>
+
+              <ScrollReveal delay={0.3}>
+                <ElegantCard className="p-8 space-y-6">
+                  <div className="text-center space-y-4">
+                    <div className="w-16 h-16 bg-gradient-to-br from-green-600 to-green-700 rounded-2xl flex items-center justify-center mx-auto">
+                      <Shield className="w-8 h-8 text-white" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-white">Security Guarantees</h3>
+                  </div>
+                  <div className="space-y-4 text-sm">
+                    <div className="flex items-center justify-between">
+                      <span className="text-neutral-400">Smart Contract Audits</span>
+                      <span className="text-green-400 font-semibold">✓ Complete</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-neutral-400">Multi-Sig Protection</span>
+                      <span className="text-green-400 font-semibold">✓ Enabled</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-neutral-400">Time-Lock Delays</span>
+                      <span className="text-green-400 font-semibold">✓ 48-72 hours</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-neutral-400">Penetration Testing</span>
+                      <span className="text-green-400 font-semibold">✓ Quarterly</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-neutral-400">Bug Bounty Program</span>
+                      <span className="text-green-400 font-semibold">✓ Active</span>
+                    </div>
+                  </div>
+                </ElegantCard>
+              </ScrollReveal>
+            </div>
+          </div>
+        </section>
+
+        {/* Supported Wallets Section */}
+        <section id="wallets" className="py-24 px-6 bg-gradient-to-b from-transparent to-neutral-950/30">
+          <div className="container mx-auto max-w-6xl">
+            <ScrollReveal>
+              <div className="text-center space-y-6 mb-16">
+                <motion.div
+                  className="inline-flex items-center px-4 py-2 rounded-full bg-blue-900/20 border border-blue-800/30 text-sm text-blue-300"
+                  whileInView={{ opacity: 1, y: 0 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  transition={{ duration: 0.6 }}
+                >
+                  <Wallet className="w-4 h-4 mr-2" />
+                  Universal Compatibility
+                </motion.div>
+                <h2 className="text-4xl lg:text-6xl font-bold">
+                  <span className="text-white">Supported</span>
+                  <br />
+                  <span className="bg-gradient-to-r from-blue-400 via-blue-300 to-blue-500 bg-clip-text text-transparent">
+                    Wallets
+                  </span>
+                </h2>
+                <p className="text-xl text-neutral-400 max-w-3xl mx-auto leading-relaxed">
+                  VaultChain works with all major Solana wallets. Protect your existing wallet without switching.
+                </p>
+              </div>
+            </ScrollReveal>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[
+                {
+                  name: "Phantom",
+                  description: "Most popular Solana wallet",
+                  logo: "P",
+                  color: "from-purple-600 to-purple-700",
+                  status: "Fully Supported",
+                },
+                {
+                  name: "Solflare",
+                  description: "Feature-rich Solana wallet",
+                  logo: "S",
+                  color: "from-orange-600 to-orange-700",
+                  status: "Fully Supported",
+                },
+                {
+                  name: "Backpack",
+                  description: "Modern multi-chain wallet",
+                  logo: "B",
+                  color: "from-green-600 to-green-700",
+                  status: "Coming Soon",
+                },
+                {
+                  name: "Glow",
+                  description: "Mobile-first Solana wallet",
+                  logo: "G",
+                  color: "from-yellow-600 to-yellow-700",
+                  status: "Coming Soon",
+                },
+              ].map((wallet, index) => (
+                <ScrollReveal key={index} delay={index * 0.1}>
+                  <ElegantCard className="p-6 space-y-4 text-center group">
+                    <div
+                      className={`w-16 h-16 bg-gradient-to-br ${wallet.color} rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300`}
+                    >
+                      <span className="text-white font-bold text-xl">{wallet.logo}</span>
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="text-xl font-semibold text-white">{wallet.name}</h3>
+                      <p className="text-sm text-neutral-400">{wallet.description}</p>
+                      <div
+                        className={`inline-flex px-3 py-1 rounded-full text-xs font-medium ${
+                          wallet.status === "Fully Supported"
+                            ? "bg-green-900/20 text-green-300 border border-green-800/30"
+                            : "bg-yellow-900/20 text-yellow-300 border border-yellow-800/30"
+                        }`}
+                      >
+                        {wallet.status}
+                      </div>
+                    </div>
+                  </ElegantCard>
+                </ScrollReveal>
+              ))}
+            </div>
+
+            <ScrollReveal delay={0.5}>
+              <div className="mt-12 text-center">
+                <p className="text-neutral-400 mb-4">Don't see your wallet?</p>
+                <SophisticatedButton variant="secondary">
+                  Request Wallet Support
+                </SophisticatedButton>
+              </div>
+            </ScrollReveal>
+          </div>
+        </section>
+
+        {/* FAQ Section */}
+        <section id="faq" className="py-24 px-6">
+          <div className="container mx-auto max-w-4xl">
+            <ScrollReveal>
+              <div className="text-center space-y-6 mb-16">
+                <motion.div
+                  className="inline-flex items-center px-4 py-2 rounded-full bg-purple-900/20 border border-purple-800/30 text-sm text-purple-300"
+                  whileInView={{ opacity: 1, y: 0 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  transition={{ duration: 0.6 }}
+                >
+                  <Eye className="w-4 h-4 mr-2" />
+                  Frequently Asked Questions
+                </motion.div>
+                <h2 className="text-4xl lg:text-6xl font-bold">
+                  <span className="text-white">Got</span>
+                  <span className="bg-gradient-to-r from-purple-400 via-purple-300 to-purple-500 bg-clip-text text-transparent">
+                    {" "}Questions?
+                  </span>
+                </h2>
+              </div>
+            </ScrollReveal>
+
+            <div className="space-y-6">
+              {[
+                {
+                  question: "How does VaultChain work with my existing wallet?",
+                  answer:
+                    "VaultChain doesn't replace your wallet. Instead, it creates a recovery system that can transfer your funds to a new wallet if you lose access. Your existing Phantom or Solflare wallet remains your primary wallet.",
+                },
+                {
+                  question: "What happens if I lose access to my wallet?",
+                  answer:
+                    "If you stop checking in for 90 days, your guardians can initiate recovery. They'll vote to approve transferring your funds to a new wallet you control. You can cancel this process if it's malicious and you still have access.",
+                },
+                {
+                  question: "Who should I choose as guardians?",
+                  answer:
+                    "Choose trusted family members or friends who own Solana wallets. We recommend 3-5 guardians with a 2-3 signature threshold. Don't choose people who live together or might collude.",
+                },
+                {
+                  question: "Is VaultChain safe? Can guardians steal my funds?",
+                  answer:
+                    "VaultChain is designed with multiple security layers. Guardians can only initiate recovery after you've been inactive for 90 days, and there's a 48-72 hour delay where you can cancel malicious attempts.",
+                },
+                {
+                  question: "What if my guardians lose access to their wallets?",
+                  answer:
+                    "You can update your guardian list anytime through the dashboard. We recommend regularly checking that your guardians still have access to their wallets and replacing them if needed.",
+                },
+                {
+                  question: "How much does VaultChain cost?",
+                  answer:
+                    "VaultChain is currently free to use. We only charge small transaction fees for on-chain operations (recovery setup, guardian votes, etc.) which go to the Solana network.",
+                },
+              ].map((item, index) => (
+                <ScrollReveal key={index} delay={index * 0.1}>
+                  <ElegantCard className="p-6">
+                    <details className="group">
+                      <summary className="flex justify-between items-center cursor-pointer list-none">
+                        <h3 className="text-lg font-semibold text-white pr-4">{item.question}</h3>
+                        <div className="flex-shrink-0 w-6 h-6 rounded-full bg-neutral-700 flex items-center justify-center group-open:bg-purple-600 transition-colors duration-300">
+                          <span className="text-sm font-bold group-open:rotate-45 transition-transform duration-300">
+                            +
+                          </span>
+                        </div>
+                      </summary>
+                      <div className="mt-4 text-neutral-400 leading-relaxed">{item.answer}</div>
+                    </details>
                   </ElegantCard>
                 </ScrollReveal>
               ))}
