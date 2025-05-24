@@ -104,9 +104,9 @@ export default function LandingPage() {
                     <WalletConnectButton size="lg" onConnect={() => (window.location.href = "/dashboard")} />
                   )}
                   <a href="#features">
-                    <SophisticatedButton variant="secondary" size="lg">
-                      See How It Works
-                    </SophisticatedButton>
+                  <SophisticatedButton variant="secondary" size="lg">
+                    See How It Works
+                  </SophisticatedButton>
                   </a>
                 </motion.div>
               </motion.div>

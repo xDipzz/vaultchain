@@ -8,11 +8,15 @@ import { Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Logo } from "@/components/logo"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { WalletConnectButton } from "@/components/wallet-connect-button"
+import { WalletDisconnectButton } from "@/components/wallet-disconnect-button"
+import { useSolana } from "@/components/solana-provider"
 
 export function PremiumHeader() {
   const [isOpen, setIsOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
   const { scrollY } = useScroll()
+  const { connected } = useSolana()
 
   const headerOpacity = useTransform(scrollY, [0, 100], [0.8, 0.95])
   const headerBlur = useTransform(scrollY, [0, 100], [10, 20])
@@ -89,19 +93,25 @@ export function PremiumHeader() {
             transition={{ duration: 0.5, delay: 0.3 }}
           >
             <ThemeToggle />
-            <Link href="/dashboard">
-              <Button
-                variant="ghost"
-                className="text-neutral-300 hover:text-white hover:bg-neutral-800/50 transition-all duration-300"
-              >
-                Connect Wallet
-              </Button>
-            </Link>
-            <Link href="/dashboard">
-              <Button className="bg-gradient-to-r from-neutral-700 to-neutral-800 hover:from-neutral-600 hover:to-neutral-700 text-white border border-neutral-600 transition-all duration-300 hover:shadow-lg hover:shadow-neutral-900/20">
-                Protect My Wallet
-              </Button>
-            </Link>
+            {connected ? (
+              <>
+                <WalletDisconnectButton size="sm" />
+                <Link href="/dashboard">
+                  <Button className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 text-white border border-purple-500 transition-all duration-300 hover:shadow-lg hover:shadow-purple-900/20">
+                    Dashboard
+                  </Button>
+                </Link>
+              </>
+            ) : (
+              <>
+                <WalletConnectButton size="sm" />
+                <Link href="/dashboard">
+                  <Button className="bg-gradient-to-r from-neutral-700 to-neutral-800 hover:from-neutral-600 hover:to-neutral-700 text-white border border-neutral-600 transition-all duration-300 hover:shadow-lg hover:shadow-neutral-900/20">
+                    Protect My Wallet
+                  </Button>
+                </Link>
+              </>
+            )}
           </motion.div>
 
           {/* Mobile Menu Button */}
@@ -138,16 +148,29 @@ export function PremiumHeader() {
               </Link>
             ))}
             <div className="pt-4 space-y-3 border-t border-neutral-700/50">
-              <Link href="/dashboard" onClick={() => setIsOpen(false)}>
-                <Button variant="ghost" className="w-full justify-start text-neutral-300 hover:text-white">
-                  Connect Wallet
-                </Button>
-              </Link>
-              <Link href="/dashboard" onClick={() => setIsOpen(false)}>
-                <Button className="w-full bg-gradient-to-r from-neutral-700 to-neutral-800 hover:from-neutral-600 hover:to-neutral-700">
-                  Protect My Wallet
-                </Button>
-              </Link>
+              {connected ? (
+                <>
+                  <div className="px-3">
+                    <WalletDisconnectButton size="sm" className="w-full" />
+                  </div>
+                  <Link href="/dashboard" onClick={() => setIsOpen(false)}>
+                    <Button className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600">
+                      Dashboard
+                    </Button>
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <div className="px-3">
+                    <WalletConnectButton size="sm" className="w-full" />
+                  </div>
+                  <Link href="/dashboard" onClick={() => setIsOpen(false)}>
+                    <Button className="w-full bg-gradient-to-r from-neutral-700 to-neutral-800 hover:from-neutral-600 hover:to-neutral-700">
+                      Protect My Wallet
+                    </Button>
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </motion.div>

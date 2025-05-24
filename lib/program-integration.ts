@@ -5,10 +5,10 @@ export function useSolanaRecovery() {
   const { connection } = useConnection()
   const { wallet, publicKey } = useWallet()
 
-  // This would initialize the actual program integration
+  // Initialize the recovery service with connection
   const recoveryService = new SolanaRecoveryService(
     connection,
-    // program instance would be created here
+    // program instance would be created here when deployed
     null as any,
     wallet,
   )
@@ -23,5 +23,6 @@ export function useSolanaRecovery() {
     getRecoveryAccount: recoveryService.getRecoveryAccount.bind(recoveryService),
     getBalance: recoveryService.getBalance.bind(recoveryService),
     getTransactionHistory: recoveryService.getTransactionHistory.bind(recoveryService),
+    isReady: !!publicKey && !!wallet,
   }
 }

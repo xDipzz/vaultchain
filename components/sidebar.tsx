@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState } from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { ChevronLeft, ChevronRight, Home, LogOut, RefreshCw, Settings, Shield, Users } from "lucide-react"
 import { motion } from "framer-motion"
 
@@ -12,13 +12,25 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Logo } from "@/components/logo"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { useSolana } from "@/components/solana-provider"
 
 export function Sidebar() {
   const [expanded, setExpanded] = useState(true)
   const pathname = usePathname()
+  const router = useRouter()
+  const { disconnect } = useSolana()
 
   const toggleSidebar = () => {
     setExpanded(!expanded)
+  }
+
+  const handleLogout = async () => {
+    try {
+      await disconnect()
+      router.push("/")
+    } catch (error) {
+      console.error("Logout failed:", error)
+    }
   }
 
   const sidebarItems = [
@@ -77,7 +89,7 @@ export function Sidebar() {
               </nav>
             </div>
             <div className="border-t p-4">
-              <Button variant="outline" className="w-full justify-start">
+              <Button variant="outline" className="w-full justify-start" onClick={handleLogout}>
                 <LogOut className="mr-2 h-4 w-4" />
                 Logout
               </Button>
@@ -143,6 +155,7 @@ export function Sidebar() {
           <Button
             variant="outline"
             className={cn("justify-start", !expanded && "flex w-full items-center justify-center p-0 px-0")}
+            onClick={handleLogout}
           >
             <LogOut className={cn("h-4 w-4", expanded && "mr-2")} />
             {expanded && "Logout"}

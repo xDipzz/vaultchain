@@ -1,13 +1,14 @@
 "use client"
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
-import { Wallet } from "lucide-react"
+import { Wallet, CheckCircle } from "lucide-react"
 import { useWallet } from "@solana/wallet-adapter-react"
 import type { WalletName } from "@solana/wallet-adapter-base"
 
 import { SophisticatedButton } from "@/components/sophisticated-button"
 import { useSolana } from "@/components/solana-provider"
 import { WalletModal } from "@/components/wallet-modal"
+import { cn } from "@/lib/utils"
 
 interface WalletConnectButtonProps {
   size?: "sm" | "md" | "lg"
@@ -72,7 +73,15 @@ export function WalletConnectButton({ size = "md", className = "", onConnect }: 
 
   return (
     <div className="space-y-2">
-      <SophisticatedButton size={size} className={className} onClick={handleConnectClick} disabled={isLoading}>
+      <SophisticatedButton 
+        size={size} 
+        className={cn(
+          className,
+          connected && "bg-green-600 hover:bg-green-700 border-green-500"
+        )} 
+        onClick={handleConnectClick} 
+        disabled={isLoading || connected}
+      >
         {isLoading ? (
           <>
             <motion.div
@@ -82,10 +91,15 @@ export function WalletConnectButton({ size = "md", className = "", onConnect }: 
             />
             Connecting...
           </>
+        ) : connected ? (
+          <>
+            <CheckCircle className="w-4 h-4 mr-2" />
+            Wallet Connected
+          </>
         ) : (
           <>
             <Wallet className="w-4 h-4 mr-2" />
-            {connected ? "Wallet Connected" : "Connect Solana Wallet"}
+            Connect Solana Wallet
           </>
         )}
       </SophisticatedButton>
