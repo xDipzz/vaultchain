@@ -21,7 +21,12 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <ThemeProvider defaultTheme="dark" attribute="class">
+        <ThemeProvider 
+          defaultTheme="dark" 
+          attribute="class"
+          enableSystem={true}
+          disableTransitionOnChange={false}
+        >
           <SolanaProvider>{children}</SolanaProvider>
         </ThemeProvider>
       </body>

@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { ArrowRight, Shield, Users, Lock, CheckCircle, Zap, Globe, Eye, RefreshCw, Clock, Wallet } from "lucide-react"
+import { ArrowRight, Shield, Users, Lock, CheckCircle, Zap, Globe, Eye, RefreshCw, Clock, Wallet, Github, Code, Star } from "lucide-react"
 import { motion } from "framer-motion"
 import { useState } from "react"
 
@@ -801,43 +801,167 @@ export default function LandingPage() {
             </ScrollReveal>
           </div>
         </section>
+
+        {/* GitHub Repository Section */}
+        <section className="py-24 px-6 bg-gradient-to-b from-black to-neutral-950/50">
+          <div className="container mx-auto max-w-4xl">
+            <ScrollReveal>
+              <div className="text-center space-y-8">
+                <motion.div
+                  className="inline-flex items-center px-4 py-2 rounded-full bg-neutral-800/30 border border-neutral-700/50 text-sm text-neutral-300"
+                  whileInView={{ opacity: 1, y: 0 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  transition={{ duration: 0.6 }}
+                >
+                  <Code className="w-4 h-4 mr-2" />
+                  Open Source
+                </motion.div>
+                <h2 className="text-4xl lg:text-6xl font-bold">
+                  <span className="text-white">Explore the</span>
+                  <br />
+                  <span className="bg-gradient-to-r from-neutral-400 via-neutral-300 to-neutral-500 bg-clip-text text-transparent">
+                    Codebase
+                  </span>
+                </h2>
+                <p className="text-xl text-neutral-400 max-w-2xl mx-auto leading-relaxed">
+                  VaultChain is built with transparency in mind. Explore our open-source codebase, contribute to the project, or build your own social recovery system.
+                </p>
+
+                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                  <a 
+                    href="https://github.com/xDipzz/vaultchain" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="group"
+                  >
+                    <ElegantCard className="p-6 hover:scale-105 transition-all duration-300 cursor-pointer">
+                      <div className="flex items-center space-x-4">
+                        <div className="w-12 h-12 bg-gradient-to-br from-neutral-700 to-neutral-800 rounded-xl flex items-center justify-center group-hover:from-neutral-600 group-hover:to-neutral-700 transition-all duration-300">
+                          <Github className="w-6 h-6 text-white" />
+                        </div>
+                        <div className="text-left">
+                          <h3 className="font-semibold text-white group-hover:text-neutral-200 transition-colors">
+                            View on GitHub
+                          </h3>
+                          <p className="text-sm text-neutral-400 group-hover:text-neutral-300 transition-colors">
+                            Complete source code
+                          </p>
+                        </div>
+                        <ArrowRight className="w-4 h-4 text-neutral-400 group-hover:text-white group-hover:translate-x-1 transition-all duration-300" />
+                      </div>
+                    </ElegantCard>
+                  </a>
+
+                  <div className="flex items-center gap-6 text-sm text-neutral-400">
+                    <div className="flex items-center gap-2">
+                      <Star className="w-4 h-4" />
+                      <span>Star the repo</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Code className="w-4 h-4" />
+                      <span>MIT License</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid sm:grid-cols-3 gap-6 mt-12">
+                  {[
+                    {
+                      title: "Solana Programs",
+                      description: "Rust-based smart contracts for wallet recovery",
+                      tech: "Anchor Framework",
+                    },
+                    {
+                      title: "Frontend App",
+                      description: "Next.js application with wallet integration",
+                      tech: "React + TypeScript",
+                    },
+                    {
+                      title: "Integration Layer",
+                      description: "TypeScript SDK for seamless wallet connection",
+                      tech: "Solana Web3.js",
+                    },
+                  ].map((item, index) => (
+                    <ScrollReveal key={index} delay={index * 0.1}>
+                      <ElegantCard className="p-6 text-center space-y-3">
+                        <h4 className="font-semibold text-white">{item.title}</h4>
+                        <p className="text-sm text-neutral-400 leading-relaxed">{item.description}</p>
+                        <div className="inline-flex px-3 py-1 rounded-full bg-neutral-800/50 border border-neutral-700/30">
+                          <span className="text-xs text-neutral-300 font-medium">{item.tech}</span>
+                        </div>
+                      </ElegantCard>
+                    </ScrollReveal>
+                  ))}
+                </div>
+              </div>
+            </ScrollReveal>
+          </div>
+        </section>
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-neutral-800/50 py-12 px-6">
+      <footer className="border-t border-border bg-background py-12 px-6">
         <div className="container mx-auto max-w-6xl">
           <div className="grid md:grid-cols-4 gap-8">
             <div className="space-y-4">
               <Logo />
-              <p className="text-sm text-neutral-400 leading-relaxed">
+              <p className="text-sm text-muted-foreground leading-relaxed">
                 Social recovery system for existing Solana wallets. Never lose access to your Phantom, Solflare, or any
                 Solana wallet again.
               </p>
+              <div className="flex items-center gap-3">
+                <a 
+                  href="https://github.com/xDipzz/vaultchain" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors duration-300"
+                >
+                  <Github className="w-4 h-4" />
+                  <span>View on GitHub</span>
+                </a>
+              </div>
             </div>
             {[
               {
                 title: "Product",
-                links: ["How It Works", "Security", "Supported Wallets", "Pricing"],
+                links: [
+                  { name: "How It Works", href: "#features" },
+                  { name: "Security", href: "#security" },
+                  { name: "Supported Wallets", href: "#wallets" },
+                  { name: "FAQ", href: "#faq" },
+                ],
               },
               {
                 title: "Resources",
-                links: ["Documentation", "Blog", "Recovery Guide", "FAQ"],
+                links: [
+                  { name: "Documentation", href: "#" },
+                  { name: "GitHub Repository", href: "https://github.com/xDipzz/vaultchain" },
+                  { name: "Recovery Guide", href: "#" },
+                  { name: "API Reference", href: "#" },
+                ],
               },
               {
-                title: "Company",
-                links: ["About", "Careers", "Contact", "Support"],
+                title: "Community",
+                links: [
+                  { name: "Discord", href: "#" },
+                  { name: "Twitter", href: "#" },
+                  { name: "Telegram", href: "#" },
+                  { name: "GitHub Discussions", href: "https://github.com/xDipzz/vaultchain/discussions" },
+                ],
               },
             ].map((section) => (
               <div key={section.title} className="space-y-4">
-                <h3 className="font-semibold text-white">{section.title}</h3>
+                <h3 className="font-semibold text-foreground">{section.title}</h3>
                 <ul className="space-y-2">
                   {section.links.map((link) => (
-                    <li key={link}>
+                    <li key={link.name}>
                       <Link
-                        href="#"
-                        className="text-sm text-neutral-400 hover:text-white transition-colors duration-300"
+                        href={link.href}
+                        target={link.href.startsWith("http") ? "_blank" : undefined}
+                        rel={link.href.startsWith("http") ? "noopener noreferrer" : undefined}
+                        className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-300 hover:underline"
                       >
-                        {link}
+                        {link.name}
                       </Link>
                     </li>
                   ))}
@@ -845,20 +969,24 @@ export default function LandingPage() {
               </div>
             ))}
           </div>
-          <div className="mt-12 pt-8 border-t border-neutral-800/50 flex flex-col md:flex-row justify-between items-center">
-            <p className="text-sm text-neutral-400">
-              &copy; {new Date().getFullYear()} VaultChain. All rights reserved.
-            </p>
-            <div className="flex space-x-6 mt-4 md:mt-0">
-              {["Twitter", "GitHub", "Discord"].map((social) => (
-                <Link
-                  key={social}
-                  href="#"
-                  className="text-sm text-neutral-400 hover:text-white transition-colors duration-300"
-                >
-                  {social}
+          <div className="mt-12 pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">
+            <div className="flex flex-col sm:flex-row items-center gap-4 text-sm text-muted-foreground">
+              <p>&copy; {new Date().getFullYear()} VaultChain. All rights reserved.</p>
+              <div className="flex items-center gap-4">
+                <Link href="#" className="hover:text-foreground transition-colors">
+                  Privacy Policy
                 </Link>
-              ))}
+                <Link href="#" className="hover:text-foreground transition-colors">
+                  Terms of Service
+                </Link>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <span className="text-xs text-muted-foreground">Built with</span>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full"></div>
+                <span className="text-sm font-medium text-foreground">Solana</span>
+              </div>
             </div>
           </div>
         </div>
