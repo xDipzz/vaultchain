@@ -28,7 +28,7 @@ export function WalletConnectButton({ size = "md", className = "", onConnect }: 
     setShowWalletModal(true)
   }
 
-  const handleWalletSelected = async (walletName: WalletName) => {
+  const handleWalletSelected = async (_walletName: WalletName) => {
     try {
       setIsConnecting(true)
       setError(null)

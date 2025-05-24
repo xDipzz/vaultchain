@@ -17,7 +17,7 @@ import { SolanaAddressDisplay } from "@/components/solana-address-display"
 import { SolanaBalanceDisplay } from "@/components/solana-balance-display"
 
 export default function DashboardPage() {
-  const { connected, publicKey, walletName, network } = useSolana()
+  const { connected, publicKey, walletName } = useSolana()
   const [recoverySystemSetup, setRecoverySystemSetup] = useState(false)
 
   const handleSetupRecovery = () => {

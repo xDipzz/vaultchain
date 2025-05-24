@@ -195,7 +195,7 @@ export default function LandingPage() {
                   </span>
                 </h2>
                 <p className="text-xl text-neutral-400 max-w-3xl mx-auto leading-relaxed">
-                  VaultChain doesn't replace your Phantom or Solflare wallet - it protects it with social recovery.
+                  VaultChain doesn&apos;t replace your Phantom or Solflare wallet - it protects it with social recovery.
                 </p>
               </div>
             </ScrollReveal>
@@ -290,8 +290,8 @@ export default function LandingPage() {
                     },
                     {
                       step: "4",
-                      title: "Create New Wallet",
-                      description: "You create a fresh Phantom wallet (or any Solana wallet) on a new device.",
+                      title: "Final Check-in",
+                      description: "You check in one last time to prove you still have access to your wallet.",
                       color: "text-purple-400",
                     },
                     {

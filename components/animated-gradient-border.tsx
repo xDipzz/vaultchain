@@ -8,7 +8,6 @@ interface AnimatedGradientBorderProps {
   children: React.ReactNode
   className?: string
   borderWidth?: number
-  duration?: number
   gradientColors?: string[]
 }
 
@@ -16,7 +15,6 @@ export function AnimatedGradientBorder({
   children,
   className = "",
   borderWidth = 1,
-  duration = 8,
   gradientColors = ["#1E40AF", "#059669", "#7C3AED"],
 }: AnimatedGradientBorderProps) {
   const [rotate, setRotate] = useState(0)
