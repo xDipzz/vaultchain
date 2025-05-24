@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useMemo, useState, type ReactNode
 import { ConnectionProvider, WalletProvider, useWallet as useSolanaWallet } from "@solana/wallet-adapter-react"
 import { WalletAdapterNetwork } from "@solana/wallet-adapter-base"
 import { PhantomWalletAdapter, SolflareWalletAdapter } from "@solana/wallet-adapter-wallets"
-import { clusterApiUrl } from "@solana/web3.js"
+import { clusterApiUrl, Connection, LAMPORTS_PER_SOL } from "@solana/web3.js"
 
 interface SolanaContextType {
   connected: boolean
@@ -49,6 +49,9 @@ export function SolanaProvider({ children }: { children: ReactNode }) {
 function SolanaContextWrapper({ children, networkName }: { children: ReactNode; networkName: string }) {
   const { publicKey, connected, connecting, wallet, connect, disconnect } = useSolanaWallet()
   const [balance, setBalance] = useState<number | null>(null)
+  
+  // Create connection instance
+  const connection = useMemo(() => new Connection(clusterApiUrl(networkName as WalletAdapterNetwork)), [networkName])
 
   // Format network name for display
   const formattedNetwork =
@@ -58,17 +61,25 @@ function SolanaContextWrapper({ children, networkName }: { children: ReactNode; 
         ? "Mainnet"
         : "Testnet"
 
-  // Simulate fetching balance
+  // Fetch real balance from Solana blockchain
   useEffect(() => {
-    if (connected && publicKey) {
-      // In a real app, you would fetch the actual balance from the Solana blockchain
-      // For demo purposes, we'll use a mock balance
-      const mockBalance = Math.random() * 100
-      setBalance(Number.parseFloat(mockBalance.toFixed(4)))
-    } else {
-      setBalance(null)
+    const fetchBalance = async () => {
+      if (connected && publicKey) {
+        try {
+          const balanceInLamports = await connection.getBalance(publicKey)
+          const balanceInSol = balanceInLamports / LAMPORTS_PER_SOL
+          setBalance(balanceInSol)
+        } catch (error) {
+          console.error("Failed to fetch balance:", error)
+          setBalance(0) // Set to 0 if fetch fails
+        }
+      } else {
+        setBalance(null)
+      }
     }
-  }, [connected, publicKey])
+
+    fetchBalance()
+  }, [connected, publicKey, connection])
 
   const value = {
     connected,

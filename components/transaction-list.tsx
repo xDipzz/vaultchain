@@ -1,66 +1,149 @@
-import { ArrowDownLeft, ArrowUpRight } from "lucide-react"
+"use client"
+
+import { useEffect, useState } from "react"
+import { ArrowDownLeft, ArrowUpRight, RefreshCw } from "lucide-react"
+import { Connection, PublicKey, clusterApiUrl } from "@solana/web3.js"
 
 import { cn } from "@/lib/utils"
+import { useSolana } from "@/components/solana-provider"
 
-const transactions = [
-  {
-    id: "1",
-    type: "receive",
-    amount: "245.8",
-    token: "SOL",
-    value: "$24,580.00",
-    from: "8xzt...3Pjm",
-    to: "7XSs...JUP",
-    date: "Today, 10:45 AM",
-    status: "completed",
-  },
-  {
-    id: "2",
-    type: "send",
-    amount: "12.5",
-    token: "SOL",
-    value: "$1,250.00",
-    from: "7XSs...JUP",
-    to: "9qLz...5Rtn",
-    date: "Yesterday, 6:30 PM",
-    status: "completed",
-  },
-  {
-    id: "3",
-    type: "receive",
-    amount: "500",
-    token: "USDC",
-    value: "$500.00",
-    from: "3mKB...7Lpt",
-    to: "7XSs...JUP",
-    date: "Feb 20, 2023",
-    status: "completed",
-  },
-  {
-    id: "4",
-    type: "send",
-    amount: "35.2",
-    token: "SOL",
-    value: "$3,520.00",
-    from: "7XSs...JUP",
-    to: "5xRt...9Kmn",
-    date: "Feb 18, 2023",
-    status: "completed",
-  },
-  {
-    id: "5",
-    type: "receive",
-    amount: "1,000",
-    token: "USDC",
-    value: "$1,000.00",
-    from: "2pQr...8Vbn",
-    to: "7XSs...JUP",
-    date: "Feb 15, 2023",
-    status: "completed",
-  },
-]
+interface Transaction {
+  id: string
+  type: "receive" | "send"
+  amount: string
+  token: string
+  signature: string
+  date: string
+  status: "completed" | "pending" | "failed"
+}
 
 export function TransactionList() {
+  const { connected, publicKey } = useSolana()
+  const [transactions, setTransactions] = useState<Transaction[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      if (!connected || !publicKey) {
+        setTransactions([])
+        setLoading(false)
+        return
+      }
+
+      setLoading(true)
+      setError(null)
+
+      try {
+        const connection = new Connection(clusterApiUrl('devnet'))
+        const pubKey = new PublicKey(publicKey)
+        
+        // Fetch recent transaction signatures
+        const signatures = await connection.getSignaturesForAddress(pubKey, { limit: 5 })
+        
+        if (signatures.length === 0) {
+          setTransactions([])
+          setLoading(false)
+          return
+        }
+
+        // Fetch transaction details
+        const transactionPromises = signatures.map(async (sigInfo) => {
+          try {
+            const transaction = await connection.getTransaction(sigInfo.signature, {
+              maxSupportedTransactionVersion: 0,
+            })
+            
+            if (!transaction || !transaction.meta) {
+              return null
+            }
+
+            // Calculate balance change
+            const preBalance = transaction.meta.preBalances[0] || 0
+            const postBalance = transaction.meta.postBalances[0] || 0
+            const balanceChange = (postBalance - preBalance) / 1000000000 // Convert lamports to SOL
+
+            // Determine transaction type
+            const type = balanceChange > 0 ? "receive" : "send"
+            const amount = Math.abs(balanceChange).toFixed(4)
+
+            return {
+              id: sigInfo.signature,
+              type,
+              amount,
+              token: "SOL",
+              signature: sigInfo.signature,
+              date: sigInfo.blockTime 
+                ? new Date(sigInfo.blockTime * 1000).toLocaleDateString()
+                : "Unknown",
+              status: transaction.meta.err ? "failed" : "completed" as const,
+            }
+          } catch (error) {
+            console.error(`Error fetching transaction ${sigInfo.signature}:`, error)
+            return null
+          }
+        })
+
+        const transactionResults = await Promise.all(transactionPromises)
+        const validTransactions = transactionResults.filter((tx): tx is Transaction => tx !== null)
+        
+        setTransactions(validTransactions)
+      } catch (error) {
+        console.error("Error fetching transactions:", error)
+        setError("Failed to load transactions")
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchTransactions()
+  }, [connected, publicKey])
+
+  if (!connected) {
+    return (
+      <div className="space-y-4">
+        <div className="text-center py-8">
+          <p className="text-sm text-muted-foreground">
+            Connect your wallet to view transaction history
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  if (loading) {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-center py-8">
+          <RefreshCw className="h-6 w-6 animate-spin text-muted-foreground" />
+          <span className="ml-2 text-sm text-muted-foreground">Loading transactions...</span>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-4">
+        <div className="text-center py-8">
+          <p className="text-sm text-red-500">{error}</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (transactions.length === 0) {
+    return (
+      <div className="space-y-4">
+        <div className="text-center py-8">
+          <p className="text-sm text-muted-foreground">
+            No transactions found for this wallet
+          </p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-4">
       {transactions.map((transaction) => (
@@ -73,6 +156,7 @@ export function TransactionList() {
               className={cn(
                 "flex h-10 w-10 items-center justify-center rounded-full",
                 transaction.type === "receive" ? "bg-green-500/10 text-green-500" : "bg-amber-500/10 text-amber-500",
+                transaction.status === "failed" && "bg-red-500/10 text-red-500",
               )}
             >
               {transaction.type === "receive" ? (
@@ -85,14 +169,19 @@ export function TransactionList() {
               <p className="font-medium leading-none">
                 {transaction.type === "receive" ? "Received" : "Sent"} {transaction.amount} {transaction.token}
               </p>
-              <p className="text-xs text-muted-foreground">
-                {transaction.type === "receive" ? "From" : "To"}:{" "}
-                {transaction.type === "receive" ? transaction.from : transaction.to}
+              <p className="text-xs text-muted-foreground font-mono">
+                {transaction.signature.slice(0, 8)}...{transaction.signature.slice(-8)}
               </p>
             </div>
           </div>
           <div className="text-right">
-            <p className="font-medium">{transaction.value}</p>
+            <p className={cn(
+              "font-medium",
+              transaction.status === "failed" && "text-red-500",
+              transaction.type === "receive" && transaction.status === "completed" && "text-green-600",
+            )}>
+              {transaction.type === "receive" ? "+" : "-"}{transaction.amount} SOL
+            </p>
             <p className="text-xs text-muted-foreground">{transaction.date}</p>
           </div>
         </div>

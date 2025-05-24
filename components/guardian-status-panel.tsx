@@ -1,43 +1,95 @@
+"use client"
+
+import { useEffect, useState } from "react"
 import { CheckCircle, Clock, User } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Progress } from "@/components/ui/progress"
+import { useSolana } from "@/components/solana-provider"
 
-const guardians = [
-  {
-    id: "1",
-    name: "Sarah Johnson",
-    email: "sarah@example.com",
-    status: "active",
-    lastCheck: "2 days ago",
-  },
-  {
-    id: "2",
-    name: "Michael Chen",
-    email: "michael@example.com",
-    status: "active",
-    lastCheck: "1 day ago",
-  },
-  {
-    id: "3",
-    name: "Alex Rodriguez",
-    email: "alex@example.com",
-    status: "active",
-    lastCheck: "3 days ago",
-  },
-  {
-    id: "4",
-    name: "Emily Wilson",
-    email: "emily@example.com",
-    status: "pending",
-    lastCheck: "Invitation sent",
-  },
-]
+interface Guardian {
+  id: string
+  address: string
+  status: "active" | "pending"
+  lastCheck: string
+}
 
 export function GuardianStatusPanel() {
+  const { connected, publicKey } = useSolana()
+  const [guardians, setGuardians] = useState<Guardian[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const loadGuardians = () => {
+      if (connected && publicKey) {
+        try {
+          const guardiansData = localStorage.getItem(`guardians_${publicKey}`)
+          if (guardiansData) {
+            const guardianAddresses = JSON.parse(guardiansData) as string[]
+            const guardiansList: Guardian[] = guardianAddresses.map((address, index) => ({
+              id: (index + 1).toString(),
+              address,
+              status: "active" as const,
+              lastCheck: "Recently", // TODO: Get actual last check from blockchain
+            }))
+            setGuardians(guardiansList)
+          } else {
+            setGuardians([])
+          }
+        } catch (error) {
+          console.error("Error loading guardians:", error)
+          setGuardians([])
+        }
+      } else {
+        setGuardians([])
+      }
+      setLoading(false)
+    }
+
+    loadGuardians()
+  }, [connected, publicKey])
+
+  if (loading) {
+    return (
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium">Guardian Status</span>
+            <span className="text-sm text-muted-foreground">Loading...</span>
+          </div>
+          <Progress value={0} className="h-2" />
+        </div>
+      </div>
+    )
+  }
+
+  if (!connected || guardians.length === 0) {
+    return (
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium">Guardian Status</span>
+            <span className="text-sm text-muted-foreground">
+              {!connected ? "Wallet not connected" : "No guardians set up"}
+            </span>
+          </div>
+          <Progress value={0} className="h-2" />
+        </div>
+        <div className="text-center py-4">
+          <p className="text-sm text-muted-foreground">
+            {!connected 
+              ? "Connect your wallet to view guardians" 
+              : "Set up your recovery system to add guardians"
+            }
+          </p>
+        </div>
+      </div>
+    )
+  }
+
   const activeGuardians = guardians.filter((guardian) => guardian.status === "active").length
   const totalGuardians = guardians.length
-  const percentage = (activeGuardians / totalGuardians) * 100
+  const percentage = totalGuardians > 0 ? (activeGuardians / totalGuardians) * 100 : 0
 
   return (
     <div className="space-y-4">
@@ -66,8 +118,10 @@ export function GuardianStatusPanel() {
                 <User className="h-4 w-4" />
               </div>
               <div className="space-y-1">
-                <p className="font-medium leading-none">{guardian.name}</p>
-                <p className="text-xs text-muted-foreground">{guardian.email}</p>
+                <p className="font-medium leading-none">Guardian #{guardian.id}</p>
+                <p className="text-xs text-muted-foreground font-mono">
+                  {guardian.address.slice(0, 8)}...{guardian.address.slice(-8)}
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-2">

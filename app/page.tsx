@@ -16,8 +16,9 @@ import { useSolana } from "@/components/solana-provider"
 import { WalletConnectButton } from "@/components/wallet-connect-button"
 
 export default function LandingPage() {
-  const { connect, connected } = useSolana()
+  const { connect, connected, publicKey, balance } = useSolana()
   const [isRedirecting, setIsRedirecting] = useState(false)
+  const [showDemo, setShowDemo] = useState(false)
 
   const handleProtectWallet = async () => {
     if (!connected) {
@@ -27,6 +28,68 @@ export default function LandingPage() {
       // Navigation will be handled by the Link component wrapping this button
     }
   }
+
+  const handleSeeHowItWorks = () => {
+    if (!connected) {
+      setShowDemo(true)
+    } else {
+      // If already connected, go to features section
+      document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })
+    }
+  }
+
+  // Demo Modal Component
+  const DemoModal = () => (
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-neutral-900 border border-neutral-700 rounded-2xl p-8 max-w-2xl w-full">
+        <div className="text-center space-y-6">
+          <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-purple-700 rounded-2xl flex items-center justify-center mx-auto">
+            <Shield className="w-8 h-8 text-white" />
+          </div>
+          <h2 className="text-3xl font-bold text-white">VaultChain Demo</h2>
+          <p className="text-neutral-400">
+            To see how VaultChain works with real data, connect your Solana wallet and explore the live dashboard.
+          </p>
+          
+          {/* Demo Features */}
+          <div className="grid gap-4 text-left">
+            <div className="flex items-start gap-3 p-4 bg-neutral-800/50 rounded-lg">
+              <Wallet className="w-5 h-5 text-purple-400 mt-0.5" />
+              <div>
+                <h4 className="font-semibold text-white">Real Wallet Protection</h4>
+                <p className="text-sm text-neutral-400">Set up recovery for your actual Phantom or Solflare wallet</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3 p-4 bg-neutral-800/50 rounded-lg">
+              <Users className="w-5 h-5 text-blue-400 mt-0.5" />
+              <div>
+                <h4 className="font-semibold text-white">Live Guardian System</h4>
+                <p className="text-sm text-neutral-400">Add real guardians and see the recovery process in action</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3 p-4 bg-neutral-800/50 rounded-lg">
+              <Clock className="w-5 h-5 text-green-400 mt-0.5" />
+              <div>
+                <h4 className="font-semibold text-white">Actual Check-ins</h4>
+                <p className="text-sm text-neutral-400">Perform real check-ins to keep your wallet protected</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="flex flex-col sm:flex-row gap-4">
+            <WalletConnectButton size="lg" redirectToDashboard={true} />
+            <SophisticatedButton 
+              variant="secondary" 
+              size="lg"
+              onClick={() => setShowDemo(false)}
+            >
+              Close Demo
+            </SophisticatedButton>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
 
   return (
     <div className="min-h-screen bg-black text-white overflow-x-hidden">
@@ -103,11 +166,13 @@ export default function LandingPage() {
                   ) : (
                     <WalletConnectButton size="lg" redirectToDashboard={true} />
                   )}
-                  <a href="#features">
-                  <SophisticatedButton variant="secondary" size="lg">
+                  <SophisticatedButton 
+                    variant="secondary" 
+                    size="lg"
+                    onClick={handleSeeHowItWorks}
+                  >
                     See How It Works
                   </SophisticatedButton>
-                  </a>
                 </motion.div>
               </motion.div>
 
@@ -136,36 +201,55 @@ export default function LandingPage() {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-3">
                           <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center">
-                            <span className="text-white font-bold text-sm">P</span>
+                            <span className="text-white font-bold text-sm">
+                              {connected ? (publicKey?.slice(0, 1) || "W") : "P"}
+                            </span>
                           </div>
                           <div>
-                            <h3 className="font-semibold text-white">Phantom Wallet</h3>
-                            <p className="text-sm text-green-400">Protected by VaultChain</p>
+                            <h3 className="font-semibold text-white">
+                              {connected ? "Your Wallet" : "Phantom Wallet"}
+                            </h3>
+                            <p className="text-sm text-green-400">
+                              {connected ? "Ready for Protection" : "Protected by VaultChain"}
+                            </p>
                           </div>
                         </div>
-                        <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" />
+                        <div className={`w-3 h-3 rounded-full animate-pulse ${connected ? 'bg-blue-500' : 'bg-green-500'}`} />
                       </div>
 
                       <div className="space-y-4">
                         <div className="flex justify-between items-center">
                           <span className="text-neutral-400">Total Balance</span>
-                          <span className="text-white font-semibold">245.8 SOL</span>
+                          <span className="text-white font-semibold">
+                            {connected 
+                              ? (balance !== null ? `${balance.toFixed(4)} SOL` : "Loading...") 
+                              : "245.8 SOL"
+                            }
+                          </span>
                         </div>
                         <div className="flex justify-between items-center">
                           <span className="text-neutral-400">Recovery Guardians</span>
-                          <span className="text-green-400 font-semibold">3/3 Active</span>
+                          <span className={`font-semibold ${connected ? 'text-orange-400' : 'text-green-400'}`}>
+                            {connected ? "Not Set Up" : "3/3 Active"}
+                          </span>
                         </div>
                         <div className="flex justify-between items-center">
                           <span className="text-neutral-400">Last Check-in</span>
-                          <span className="text-white font-semibold">2 days ago</span>
+                          <span className="text-white font-semibold">
+                            {connected ? "Never" : "2 days ago"}
+                          </span>
                         </div>
                       </div>
 
                       <div className="h-px bg-gradient-to-r from-transparent via-neutral-700 to-transparent" />
 
                       <div className="text-center">
-                        <div className="text-sm text-green-400 font-medium">✓ Recovery System Active</div>
-                        <div className="text-xs text-neutral-400 mt-1">Your wallet is protected</div>
+                        <div className={`text-sm font-medium ${connected ? 'text-orange-400' : 'text-green-400'}`}>
+                          {connected ? "⚠ Recovery System Not Set Up" : "✓ Recovery System Active"}
+                        </div>
+                        <div className="text-xs text-neutral-400 mt-1">
+                          {connected ? "Connect to dashboard to set up protection" : "Your wallet is protected"}
+                        </div>
                       </div>
                     </div>
                   </ElegantCard>
@@ -994,6 +1078,8 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
+
+      {showDemo && <DemoModal />}
     </div>
   )
 }

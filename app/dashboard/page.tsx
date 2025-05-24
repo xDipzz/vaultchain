@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { ArrowRight, ArrowUpRight, CheckCircle, Clock, Send, Users, Shield, Wallet, RefreshCw } from "lucide-react"
 import Link from "next/link"
 
@@ -19,6 +19,41 @@ import { SolanaBalanceDisplay } from "@/components/solana-balance-display"
 export default function DashboardPage() {
   const { connected, publicKey, walletName } = useSolana()
   const [recoverySystemSetup, setRecoverySystemSetup] = useState(false)
+  const [recoveryAccountData, setRecoveryAccountData] = useState<any>(null)
+  const [isLoading, setIsLoading] = useState(true)
+
+  // Check if recovery system is set up
+  useEffect(() => {
+    const checkRecoverySystem = async () => {
+      if (connected && publicKey) {
+        setIsLoading(true)
+        try {
+          // TODO: Check if recovery system exists on-chain for this wallet
+          // For now, we'll check localStorage for setup status
+          const setupStatus = localStorage.getItem(`recovery_setup_${publicKey}`)
+          setRecoverySystemSetup(setupStatus === 'true')
+          
+          // TODO: Fetch actual recovery account data from blockchain
+          if (setupStatus === 'true') {
+            setRecoveryAccountData({
+              guardians: JSON.parse(localStorage.getItem(`guardians_${publicKey}`) || '[]'),
+              threshold: parseInt(localStorage.getItem(`threshold_${publicKey}`) || '2'),
+              lastCheckin: parseInt(localStorage.getItem(`last_checkin_${publicKey}`) || '0'),
+              checkinPeriod: parseInt(localStorage.getItem(`checkin_period_${publicKey}`) || '2592000'), // 30 days
+            })
+          }
+        } catch (error) {
+          console.error('Error checking recovery system:', error)
+        } finally {
+          setIsLoading(false)
+        }
+      } else {
+        setIsLoading(false)
+      }
+    }
+
+    checkRecoverySystem()
+  }, [connected, publicKey])
 
   const handleSetupRecovery = () => {
     setRecoverySystemSetup(true)
@@ -35,6 +70,22 @@ export default function DashboardPage() {
               Connect your Phantom or Solflare wallet to set up social recovery protection.
             </p>
             <WalletConnectButton size="lg" />
+          </div>
+        </div>
+      </DashboardShell>
+    )
+  }
+
+  if (isLoading) {
+    return (
+      <DashboardShell>
+        <div className="flex flex-col items-center justify-center min-h-[60vh] max-w-md mx-auto text-center space-y-8">
+          <div>
+            <RefreshCw className="w-16 h-16 text-neutral-400 mb-4 animate-spin" />
+            <h2 className="text-2xl font-bold mb-2">Loading Recovery System</h2>
+            <p className="text-neutral-400 mb-6">
+              Checking your wallet's recovery system status...
+            </p>
           </div>
         </div>
       </DashboardShell>
@@ -62,6 +113,37 @@ export default function DashboardPage() {
         </div>
       </DashboardShell>
     )
+  }
+
+  const getLastCheckinText = () => {
+    if (!recoveryAccountData?.lastCheckin) return "Never"
+    const lastCheckin = new Date(recoveryAccountData.lastCheckin * 1000)
+    const now = new Date()
+    const diffInDays = Math.floor((now.getTime() - lastCheckin.getTime()) / (1000 * 60 * 60 * 24))
+    
+    if (diffInDays === 0) return "Today"
+    if (diffInDays === 1) return "Yesterday"
+    return `${diffInDays} days ago`
+  }
+
+  const getNextCheckinText = () => {
+    if (!recoveryAccountData?.lastCheckin) return "Check in now"
+    const lastCheckin = recoveryAccountData.lastCheckin
+    const checkinPeriod = recoveryAccountData.checkinPeriod
+    const nextCheckin = lastCheckin + checkinPeriod
+    const now = Math.floor(Date.now() / 1000)
+    const diffInSeconds = nextCheckin - now
+    
+    if (diffInSeconds <= 0) return "Overdue"
+    
+    const diffInDays = Math.floor(diffInSeconds / (60 * 60 * 24))
+    if (diffInDays > 0) return `${diffInDays} days`
+    
+    const diffInHours = Math.floor(diffInSeconds / (60 * 60))
+    if (diffInHours > 0) return `${diffInHours} hours`
+    
+    const diffInMinutes = Math.floor(diffInSeconds / 60)
+    return `${diffInMinutes} minutes`
   }
 
   return (
@@ -104,7 +186,7 @@ export default function DashboardPage() {
                 <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" />
                 <span className="text-sm font-medium text-green-400">Recovery Active</span>
               </div>
-              <p className="text-xs text-neutral-400">Last check-in: 2 days ago</p>
+              <p className="text-xs text-neutral-400">Last check-in: {getLastCheckinText()}</p>
             </div>
           </div>
         </ElegantCard>
@@ -133,19 +215,19 @@ export default function DashboardPage() {
           },
           {
             title: "Recovery Guardians",
-            value: "3/3 Active",
-            change: "All guardians ready",
+            value: `${recoveryAccountData?.guardians?.length || 0}/${recoveryAccountData?.guardians?.length || 0} Active`,
+            change: recoveryAccountData?.guardians?.length > 0 ? "All guardians ready" : "No guardians set",
             icon: <Users className="h-5 w-5 text-neutral-400" />,
           },
           {
             title: "Recovery Threshold",
-            value: "2 of 3",
+            value: `${recoveryAccountData?.threshold || 0} of ${recoveryAccountData?.guardians?.length || 0}`,
             change: "Guardians needed",
             icon: <Shield className="h-5 w-5 text-neutral-400" />,
           },
           {
             title: "Next Check-in",
-            value: "28 days",
+            value: getNextCheckinText(),
             change: "Stay protected",
             icon: <Clock className="h-5 w-5 text-neutral-400" />,
           },

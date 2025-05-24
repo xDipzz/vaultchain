@@ -1,4 +1,8 @@
+"use client"
+
+import { useState, useEffect } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { ArrowLeft, ArrowRight, CheckCircle, Shield, Users } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -8,8 +12,135 @@ import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { DashboardHeader } from "@/components/dashboard-header"
 import { DashboardShell } from "@/components/dashboard-shell"
+import { useSolana } from "@/components/solana-provider"
+
+interface Guardian {
+  id: string
+  address: string
+  isValid: boolean
+}
 
 export default function SetupRecoveryPage() {
+  const router = useRouter()
+  const { connected, publicKey } = useSolana()
+  const [currentStep, setCurrentStep] = useState("step1")
+  const [isDeploying, setIsDeploying] = useState(false)
+  
+  // Form state
+  const [recoveryName, setRecoveryName] = useState("")
+  const [threshold, setThreshold] = useState(2)
+  const [checkinPeriod, setCheckinPeriod] = useState(30) // days
+  const [recoveryDelay, setRecoveryDelay] = useState(3) // days
+  const [guardians, setGuardians] = useState<Guardian[]>([
+    { id: '1', address: '', isValid: false },
+    { id: '2', address: '', isValid: false },
+    { id: '3', address: '', isValid: false },
+  ])
+
+  // Validation
+  const isStep1Valid = recoveryName.trim().length > 0
+  const isStep2Valid = threshold >= 2 && threshold <= guardians.length
+  const isStep3Valid = guardians.filter(g => g.isValid).length >= threshold
+  const isStep4Valid = isStep1Valid && isStep2Valid && isStep3Valid
+
+  // Validate Solana address
+  const validateSolanaAddress = (address: string) => {
+    if (!address.trim()) return false
+    try {
+      // Basic validation - Solana addresses are base58 encoded and typically 32-44 characters
+      return address.length >= 32 && address.length <= 44 && /^[1-9A-HJ-NP-Za-km-z]+$/.test(address)
+    } catch {
+      return false
+    }
+  }
+
+  // Update guardian address
+  const updateGuardianAddress = (id: string, address: string) => {
+    setGuardians(prev => 
+      prev.map(g => 
+        g.id === id 
+          ? { ...g, address, isValid: validateSolanaAddress(address) }
+          : g
+      )
+    )
+  }
+
+  // Add guardian
+  const addGuardian = () => {
+    const newId = (guardians.length + 1).toString()
+    setGuardians(prev => [...prev, { id: newId, address: '', isValid: false }])
+  }
+
+  // Remove guardian
+  const removeGuardian = (id: string) => {
+    if (guardians.length > 3) { // Keep minimum 3 guardians
+      setGuardians(prev => prev.filter(g => g.id !== id))
+    }
+  }
+
+  // Deploy recovery system
+  const deployRecoverySystem = async () => {
+    if (!connected || !publicKey) return
+    
+    setIsDeploying(true)
+    try {
+      // TODO: Replace with actual smart contract deployment
+      // For now, we'll simulate the deployment and store in localStorage
+      
+      // Simulate deployment delay
+      await new Promise(resolve => setTimeout(resolve, 3000))
+      
+      // Store setup data in localStorage (this will be replaced with blockchain storage)
+      localStorage.setItem(`recovery_setup_${publicKey}`, 'true')
+      localStorage.setItem(`recovery_name_${publicKey}`, recoveryName)
+      localStorage.setItem(`threshold_${publicKey}`, threshold.toString())
+      localStorage.setItem(`checkin_period_${publicKey}`, (checkinPeriod * 24 * 60 * 60).toString()) // Convert to seconds
+      localStorage.setItem(`recovery_delay_${publicKey}`, (recoveryDelay * 24 * 60 * 60).toString()) // Convert to seconds
+      localStorage.setItem(`guardians_${publicKey}`, JSON.stringify(guardians.filter(g => g.isValid).map(g => g.address)))
+      localStorage.setItem(`last_checkin_${publicKey}`, Math.floor(Date.now() / 1000).toString())
+      
+      // Redirect to dashboard
+      router.push('/dashboard')
+    } catch (error) {
+      console.error('Failed to deploy recovery system:', error)
+      alert('Failed to deploy recovery system. Please try again.')
+    } finally {
+      setIsDeploying(false)
+    }
+  }
+
+  // Navigation functions
+  const goToStep = (step: string) => {
+    setCurrentStep(step)
+  }
+
+  const nextStep = () => {
+    const steps = ["step1", "step2", "step3", "step4"]
+    const currentIndex = steps.indexOf(currentStep)
+    if (currentIndex < steps.length - 1) {
+      setCurrentStep(steps[currentIndex + 1])
+    }
+  }
+
+  const prevStep = () => {
+    const steps = ["step1", "step2", "step3", "step4"]
+    const currentIndex = steps.indexOf(currentStep)
+    if (currentIndex > 0) {
+      setCurrentStep(steps[currentIndex - 1])
+    }
+  }
+
+  // Redirect if not connected
+  useEffect(() => {
+    if (!connected) {
+      router.push('/dashboard')
+    }
+  }, [connected, router])
+
+  if (!connected) {
+    return null
+  }
+
   return (
     <DashboardShell>
       <DashboardHeader
@@ -31,41 +162,52 @@ export default function SetupRecoveryPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="step1" className="w-full">
+          <Tabs value={currentStep} className="w-full">
             <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="step1">1. Connect</TabsTrigger>
-              <TabsTrigger value="step2">2. Security</TabsTrigger>
-              <TabsTrigger value="step3">3. Guardians</TabsTrigger>
-              <TabsTrigger value="step4">4. Confirm</TabsTrigger>
+              <TabsTrigger value="step1" onClick={() => goToStep("step1")}>1. Connect</TabsTrigger>
+              <TabsTrigger value="step2" onClick={() => goToStep("step2")} disabled={!isStep1Valid}>2. Security</TabsTrigger>
+              <TabsTrigger value="step3" onClick={() => goToStep("step3")} disabled={!isStep2Valid}>3. Guardians</TabsTrigger>
+              <TabsTrigger value="step4" onClick={() => goToStep("step4")} disabled={!isStep3Valid}>4. Confirm</TabsTrigger>
             </TabsList>
+            
             <TabsContent value="step1" className="space-y-4 pt-6">
               <div className="space-y-2">
                 <h3 className="text-lg font-medium">Connect Your Wallet</h3>
                 <p className="text-sm text-muted-foreground">
-                  First, let's connect your existing Solana wallet to set up the recovery system.
+                  First, let's set up the recovery system for your connected Solana wallet.
                 </p>
               </div>
               <div className="grid gap-4 py-4">
                 <div className="grid gap-2">
                   <Label htmlFor="wallet-address">Your Wallet Address</Label>
-                  <Input id="wallet-address" value="7XSs3z4H...9qLCJUP" readOnly />
+                  <Input 
+                    id="wallet-address" 
+                    value={publicKey ? `${publicKey.slice(0, 8)}...${publicKey.slice(-8)}` : ""} 
+                    readOnly 
+                  />
                   <p className="text-xs text-muted-foreground">This is the wallet that will be protected.</p>
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="recovery-name">Recovery System Name</Label>
-                  <Input id="recovery-name" placeholder="My Wallet Recovery" />
+                  <Input 
+                    id="recovery-name" 
+                    placeholder="My Wallet Recovery" 
+                    value={recoveryName}
+                    onChange={(e) => setRecoveryName(e.target.value)}
+                  />
                   <p className="text-xs text-muted-foreground">
                     Choose a name to help you identify this recovery system.
                   </p>
                 </div>
               </div>
               <div className="flex justify-end">
-                <Button>
+                <Button onClick={nextStep} disabled={!isStep1Valid}>
                   Continue to Security
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </div>
             </TabsContent>
+            
             <TabsContent value="step2" className="space-y-4 pt-6">
               <div className="space-y-2">
                 <h3 className="text-lg font-medium">Security Settings</h3>
@@ -77,19 +219,33 @@ export default function SetupRecoveryPage() {
                 <div className="grid gap-2">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="recovery-threshold">Recovery Threshold</Label>
-                    <span className="text-sm text-muted-foreground">3 guardians</span>
+                    <span className="text-sm text-muted-foreground">{threshold} guardians</span>
                   </div>
-                  <Input id="recovery-threshold" type="range" min="2" max="5" defaultValue="3" />
+                  <Input 
+                    id="recovery-threshold" 
+                    type="range" 
+                    min="2" 
+                    max="5" 
+                    value={threshold}
+                    onChange={(e) => setThreshold(parseInt(e.target.value))}
+                  />
                   <p className="text-xs text-muted-foreground">
-                    Number of guardians required to recover your wallet. We recommend at least 3 for optimal security.
+                    Number of guardians required to recover your wallet. We recommend at least 2 for optimal security.
                   </p>
                 </div>
                 <div className="grid gap-2">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="check-in-period">Check-in Period</Label>
-                    <span className="text-sm text-muted-foreground">30 days</span>
+                    <span className="text-sm text-muted-foreground">{checkinPeriod} days</span>
                   </div>
-                  <Input id="check-in-period" type="range" min="7" max="90" defaultValue="30" />
+                  <Input 
+                    id="check-in-period" 
+                    type="range" 
+                    min="7" 
+                    max="90" 
+                    value={checkinPeriod}
+                    onChange={(e) => setCheckinPeriod(parseInt(e.target.value))}
+                  />
                   <p className="text-xs text-muted-foreground">
                     How often you need to check in to confirm wallet access. If you miss a check-in, recovery options
                     become available.
@@ -97,26 +253,34 @@ export default function SetupRecoveryPage() {
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="recovery-delay">Recovery Delay</Label>
-                  <Input id="recovery-delay" type="range" min="1" max="7" defaultValue="3" />
+                  <Input 
+                    id="recovery-delay" 
+                    type="range" 
+                    min="1" 
+                    max="7" 
+                    value={recoveryDelay}
+                    onChange={(e) => setRecoveryDelay(parseInt(e.target.value))}
+                  />
                   <div className="flex items-center justify-between">
                     <p className="text-xs text-muted-foreground">
                       Waiting period before recovery is completed. This gives you time to cancel if unauthorized.
                     </p>
-                    <span className="text-sm text-muted-foreground">3 days</span>
+                    <span className="text-sm text-muted-foreground">{recoveryDelay} days</span>
                   </div>
                 </div>
               </div>
               <div className="flex justify-between">
-                <Button variant="outline">
+                <Button variant="outline" onClick={prevStep}>
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   Back
                 </Button>
-                <Button>
+                <Button onClick={nextStep} disabled={!isStep2Valid}>
                   Continue to Guardians
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </div>
             </TabsContent>
+            
             <TabsContent value="step3" className="space-y-4 pt-6">
               <div className="space-y-2">
                 <h3 className="text-lg font-medium">Add Recovery Guardians</h3>
@@ -126,68 +290,66 @@ export default function SetupRecoveryPage() {
               </div>
               <div className="grid gap-6 py-4">
                 <div className="grid gap-4">
-                  <div className="rounded-lg border p-4">
-                    <div className="flex items-start justify-between">
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2">
-                          <Users className="h-4 w-4 text-primary" />
-                          <h4 className="font-medium">Guardian #1</h4>
+                  {guardians.map((guardian, index) => (
+                    <div key={guardian.id} className="rounded-lg border p-4">
+                      <div className="flex items-start justify-between">
+                        <div className="space-y-2 flex-1">
+                          <div className="flex items-center gap-2">
+                            <Users className="h-4 w-4 text-primary" />
+                            <h4 className="font-medium">Guardian #{index + 1}</h4>
+                            {guardian.isValid && <CheckCircle className="h-4 w-4 text-green-500" />}
+                          </div>
+                          <div className="grid gap-1">
+                            <Label htmlFor={`guardian-${guardian.id}-address`}>Solana Address</Label>
+                            <Input 
+                              id={`guardian-${guardian.id}-address`} 
+                              placeholder="Enter Solana wallet address" 
+                              value={guardian.address}
+                              onChange={(e) => updateGuardianAddress(guardian.id, e.target.value)}
+                              className={guardian.address && !guardian.isValid ? "border-red-500" : ""}
+                            />
+                            {guardian.address && !guardian.isValid && (
+                              <p className="text-xs text-red-500">Invalid Solana address</p>
+                            )}
+                          </div>
                         </div>
-                        <div className="grid gap-1">
-                          <Label htmlFor="guardian-1-address">Solana Address</Label>
-                          <Input id="guardian-1-address" placeholder="Enter Solana wallet address" />
-                        </div>
+                        {guardians.length > 3 && (
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            onClick={() => removeGuardian(guardian.id)}
+                            className="ml-2"
+                          >
+                            Remove
+                          </Button>
+                        )}
                       </div>
-                      <CheckCircle className="h-5 w-5 text-secondary" />
                     </div>
-                  </div>
-                  <div className="rounded-lg border p-4">
-                    <div className="flex items-start justify-between">
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2">
-                          <Users className="h-4 w-4 text-primary" />
-                          <h4 className="font-medium">Guardian #2</h4>
-                        </div>
-                        <div className="grid gap-1">
-                          <Label htmlFor="guardian-2-address">Solana Address</Label>
-                          <Input id="guardian-2-address" placeholder="Enter Solana wallet address" />
-                        </div>
-                      </div>
-                      <CheckCircle className="h-5 w-5 text-secondary" />
-                    </div>
-                  </div>
-                  <div className="rounded-lg border p-4">
-                    <div className="flex items-start justify-between">
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2">
-                          <Users className="h-4 w-4 text-primary" />
-                          <h4 className="font-medium">Guardian #3</h4>
-                        </div>
-                        <div className="grid gap-1">
-                          <Label htmlFor="guardian-3-address">Solana Address</Label>
-                          <Input id="guardian-3-address" placeholder="Enter Solana wallet address" />
-                        </div>
-                      </div>
-                      <CheckCircle className="h-5 w-5 text-secondary" />
-                    </div>
-                  </div>
-                  <Button variant="outline" className="w-full">
-                    <Users className="mr-2 h-4 w-4" />
-                    Add Another Guardian (Optional)
-                  </Button>
+                  ))}
+                  {guardians.length < 5 && (
+                    <Button variant="outline" className="w-full" onClick={addGuardian}>
+                      <Users className="mr-2 h-4 w-4" />
+                      Add Another Guardian
+                    </Button>
+                  )}
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  You need at least {threshold} valid guardian addresses to proceed.
+                  Currently: {guardians.filter(g => g.isValid).length}/{threshold}
                 </div>
               </div>
               <div className="flex justify-between">
-                <Button variant="outline">
+                <Button variant="outline" onClick={prevStep}>
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   Back
                 </Button>
-                <Button>
+                <Button onClick={nextStep} disabled={!isStep3Valid}>
                   Continue to Confirm
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </div>
             </TabsContent>
+            
             <TabsContent value="step4" className="space-y-4 pt-6">
               <div className="space-y-2">
                 <h3 className="text-lg font-medium">Confirm Recovery Setup</h3>
@@ -199,37 +361,31 @@ export default function SetupRecoveryPage() {
                     <h4 className="font-medium">Wallet Details</h4>
                     <div className="grid grid-cols-2 gap-2 text-sm">
                       <div className="text-muted-foreground">Protected Wallet:</div>
-                      <div>7XSs...JUP (Phantom)</div>
+                      <div>{publicKey ? `${publicKey.slice(0, 8)}...${publicKey.slice(-8)}` : ""}</div>
                       <div className="text-muted-foreground">Recovery Name:</div>
-                      <div>My Wallet Recovery</div>
+                      <div>{recoveryName}</div>
                     </div>
                   </div>
                   <div className="space-y-1">
                     <h4 className="font-medium">Security Settings</h4>
                     <div className="grid grid-cols-2 gap-2 text-sm">
                       <div className="text-muted-foreground">Recovery Threshold:</div>
-                      <div>3 guardians</div>
+                      <div>{threshold} guardians</div>
                       <div className="text-muted-foreground">Check-in Period:</div>
-                      <div>30 days</div>
+                      <div>{checkinPeriod} days</div>
                       <div className="text-muted-foreground">Recovery Delay:</div>
-                      <div>3 days</div>
+                      <div>{recoveryDelay} days</div>
                     </div>
                   </div>
                   <div className="space-y-1">
-                    <h4 className="font-medium">Guardians (3)</h4>
+                    <h4 className="font-medium">Guardians ({guardians.filter(g => g.isValid).length})</h4>
                     <div className="grid gap-2 text-sm">
-                      <div className="flex items-center gap-2">
-                        <CheckCircle className="h-4 w-4 text-secondary" />
-                        <span>7XSs...JUP</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <CheckCircle className="h-4 w-4 text-secondary" />
-                        <span>9qLz...5Rtn</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <CheckCircle className="h-4 w-4 text-secondary" />
-                        <span>3mKB...7Lpt</span>
-                      </div>
+                      {guardians.filter(g => g.isValid).map((guardian, index) => (
+                        <div key={guardian.id} className="flex items-center gap-2">
+                          <CheckCircle className="h-4 w-4 text-green-500" />
+                          <span>{guardian.address.slice(0, 8)}...{guardian.address.slice(-8)}</span>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -247,13 +403,13 @@ export default function SetupRecoveryPage() {
                 </div>
               </div>
               <div className="flex justify-between">
-                <Button variant="outline">
+                <Button variant="outline" onClick={prevStep}>
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   Back
                 </Button>
-                <Button>
+                <Button onClick={deployRecoverySystem} disabled={!isStep4Valid || isDeploying}>
                   <Shield className="mr-2 h-4 w-4" />
-                  Deploy Recovery Program
+                  {isDeploying ? "Deploying..." : "Deploy Recovery Program"}
                 </Button>
               </div>
             </TabsContent>
@@ -265,7 +421,9 @@ export default function SetupRecoveryPage() {
               <Shield className="h-5 w-5 text-primary" />
               <span className="text-sm font-medium">Solana-powered social recovery system</span>
             </div>
-            <p className="text-sm text-muted-foreground">Step 1 of 4</p>
+            <p className="text-sm text-muted-foreground">
+              Step {currentStep === "step1" ? "1" : currentStep === "step2" ? "2" : currentStep === "step3" ? "3" : "4"} of 4
+            </p>
           </div>
         </CardFooter>
       </Card>
