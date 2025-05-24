@@ -34,7 +34,7 @@ export function WalletDisconnectButton({ size = "md", className = "", onDisconne
   }
 
   const truncatedAddress = publicKey 
-    ? `${publicKey.slice(0, 4)}...${publicKey.slice(-4)}`
+    ? `${publicKey.toString().slice(0, 4)}...${publicKey.toString().slice(-4)}`
     : ""
 
   return (

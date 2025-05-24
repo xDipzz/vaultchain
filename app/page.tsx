@@ -202,7 +202,7 @@ export default function LandingPage() {
                         <div className="flex items-center space-x-3">
                           <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center">
                             <span className="text-white font-bold text-sm">
-                              {connected ? (publicKey?.slice(0, 1) || "W") : "P"}
+                              {connected ? (publicKey?.toString().slice(0, 1) || "W") : "P"}
                             </span>
                           </div>
                           <div>

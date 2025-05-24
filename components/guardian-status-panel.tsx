@@ -23,7 +23,7 @@ export function GuardianStatusPanel() {
     const loadGuardians = () => {
       if (connected && publicKey) {
         try {
-          const guardiansData = localStorage.getItem(`guardians_${publicKey}`)
+          const guardiansData = localStorage.getItem(`guardians_${publicKey.toString()}`)
           if (guardiansData) {
             const guardianAddresses = JSON.parse(guardiansData) as string[]
             const guardiansList: Guardian[] = guardianAddresses.map((address, index) => ({

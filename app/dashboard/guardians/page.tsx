@@ -37,9 +37,9 @@ export default function GuardiansPage() {
       if (connected && publicKey) {
         try {
           // Load existing guardians
-          const guardiansData = localStorage.getItem(`guardians_${publicKey}`)
-          const thresholdData = localStorage.getItem(`threshold_${publicKey}`)
-          const recoveryDelayData = localStorage.getItem(`recovery_delay_${publicKey}`)
+          const guardiansData = localStorage.getItem(`guardians_${publicKey.toString()}`)
+          const thresholdData = localStorage.getItem(`threshold_${publicKey.toString()}`)
+          const recoveryDelayData = localStorage.getItem(`recovery_delay_${publicKey.toString()}`)
 
           if (guardiansData) {
             const guardianAddresses = JSON.parse(guardiansData) as string[]
@@ -95,7 +95,7 @@ export default function GuardiansPage() {
       return
     }
 
-    if (newGuardianAddress === publicKey) {
+    if (newGuardianAddress === publicKey?.toString()) {
       setError("You cannot add yourself as a guardian")
       return
     }
@@ -114,7 +114,7 @@ export default function GuardiansPage() {
 
       // Save to localStorage
       const guardianAddresses = updatedGuardians.map(g => g.address)
-      localStorage.setItem(`guardians_${publicKey}`, JSON.stringify(guardianAddresses))
+      localStorage.setItem(`guardians_${publicKey.toString()}`, JSON.stringify(guardianAddresses))
 
       setNewGuardianAddress("")
       setError(null)
@@ -135,13 +135,13 @@ export default function GuardiansPage() {
 
     // Save to localStorage
     const guardianAddresses = updatedGuardians.map(g => g.address)
-    localStorage.setItem(`guardians_${publicKey}`, JSON.stringify(guardianAddresses))
+    localStorage.setItem(`guardians_${publicKey.toString()}`, JSON.stringify(guardianAddresses))
 
     // Update threshold if it's higher than remaining guardians
     if (threshold > updatedGuardians.length) {
       const newThreshold = Math.max(2, updatedGuardians.length)
       setThreshold(newThreshold)
-      localStorage.setItem(`threshold_${publicKey}`, newThreshold.toString())
+      localStorage.setItem(`threshold_${publicKey.toString()}`, newThreshold.toString())
     }
   }
 
@@ -150,7 +150,7 @@ export default function GuardiansPage() {
     if (!connected || !publicKey) return
     
     setThreshold(newThreshold)
-    localStorage.setItem(`threshold_${publicKey}`, newThreshold.toString())
+    localStorage.setItem(`threshold_${publicKey.toString()}`, newThreshold.toString())
   }
 
   // Update recovery delay
@@ -159,7 +159,7 @@ export default function GuardiansPage() {
     
     setRecoveryDelay(newDelay)
     // Convert days to seconds for storage
-    localStorage.setItem(`recovery_delay_${publicKey}`, (newDelay * 24 * 60 * 60).toString())
+    localStorage.setItem(`recovery_delay_${publicKey.toString()}`, (newDelay * 24 * 60 * 60).toString())
   }
 
   // Redirect to setup if not connected

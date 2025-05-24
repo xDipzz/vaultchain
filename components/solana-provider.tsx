@@ -8,7 +8,7 @@ import {
   PhantomWalletAdapter,
   SolflareWalletAdapter,
 } from '@solana/wallet-adapter-wallets'
-import { clusterApiUrl, Connection, LAMPORTS_PER_SOL } from '@solana/web3.js'
+import { clusterApiUrl, Connection, LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js'
 import { solanaService, SolanaService } from '@/lib/solana-service'
 
 require('@solana/wallet-adapter-react-ui/styles.css')
@@ -21,6 +21,13 @@ interface SolanaContextType {
   loading: boolean
   service: SolanaService
   refreshBalance: () => Promise<void>
+  connected: boolean
+  publicKey: PublicKey | null
+  connecting: boolean
+  walletName: string | null
+  disconnect: () => Promise<void>
+  connect: () => Promise<void>
+  network: string
 }
 
 const SolanaContext = createContext<SolanaContextType>({
@@ -28,6 +35,13 @@ const SolanaContext = createContext<SolanaContextType>({
   loading: false,
   service: solanaService,
   refreshBalance: async () => {},
+  connected: false,
+  publicKey: null,
+  connecting: false,
+  walletName: null,
+  disconnect: async () => {},
+  connect: async () => {},
+  network: 'devnet',
 })
 
 export const useSolana = () => useContext(SolanaContext)
@@ -55,6 +69,24 @@ function SolanaServiceProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  const handleConnect = async () => {
+    try {
+      await wallet.connect()
+    } catch (error) {
+      console.error('Error connecting wallet:', error)
+      throw error
+    }
+  }
+
+  const handleDisconnect = async () => {
+    try {
+      await wallet.disconnect()
+    } catch (error) {
+      console.error('Error disconnecting wallet:', error)
+      throw error
+    }
+  }
+
   useEffect(() => {
     // Set up the service provider when wallet changes
     if (wallet.publicKey && wallet.signTransaction) {
@@ -76,7 +108,19 @@ function SolanaServiceProvider({ children }: { children: React.ReactNode }) {
   }, [wallet.connected, wallet.connecting, wallet.publicKey, wallet.wallet])
 
   return (
-    <SolanaContext.Provider value={{ balance, loading, service: solanaService, refreshBalance }}>
+    <SolanaContext.Provider value={{ 
+      balance, 
+      loading, 
+      service: solanaService, 
+      refreshBalance,
+      connected: wallet.connected,
+      publicKey: wallet.publicKey,
+      connecting: wallet.connecting,
+      walletName: wallet.wallet?.adapter.name || null,
+      disconnect: handleDisconnect,
+      connect: handleConnect,
+      network: network.toLowerCase(),
+    }}>
       {children}
     </SolanaContext.Provider>
   )

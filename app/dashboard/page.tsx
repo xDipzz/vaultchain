@@ -30,16 +30,16 @@ export default function DashboardPage() {
         try {
           // TODO: Check if recovery system exists on-chain for this wallet
           // For now, we'll check localStorage for setup status
-          const setupStatus = localStorage.getItem(`recovery_setup_${publicKey}`)
+          const setupStatus = localStorage.getItem(`recovery_setup_${publicKey.toString()}`)
           setRecoverySystemSetup(setupStatus === 'true')
           
           // TODO: Fetch actual recovery account data from blockchain
           if (setupStatus === 'true') {
             setRecoveryAccountData({
-              guardians: JSON.parse(localStorage.getItem(`guardians_${publicKey}`) || '[]'),
-              threshold: parseInt(localStorage.getItem(`threshold_${publicKey}`) || '2'),
-              lastCheckin: parseInt(localStorage.getItem(`last_checkin_${publicKey}`) || '0'),
-              checkinPeriod: parseInt(localStorage.getItem(`checkin_period_${publicKey}`) || '2592000'), // 30 days
+              guardians: JSON.parse(localStorage.getItem(`guardians_${publicKey.toString()}`) || '[]'),
+              threshold: parseInt(localStorage.getItem(`threshold_${publicKey.toString()}`) || '2'),
+              lastCheckin: parseInt(localStorage.getItem(`last_checkin_${publicKey.toString()}`) || '0'),
+              checkinPeriod: parseInt(localStorage.getItem(`checkin_period_${publicKey.toString()}`) || '2592000'), // 30 days
             })
           }
         } catch (error) {
@@ -177,7 +177,7 @@ export default function DashboardPage() {
                 <h3 className="text-lg font-semibold text-white">{walletName || "Solana Wallet"}</h3>
                 <p className="text-sm text-green-400">Protected by VaultChain Recovery</p>
                 {publicKey && (
-                  <SolanaAddressDisplay address={publicKey} showExplorer={false} className="text-xs text-neutral-400" />
+                  <SolanaAddressDisplay address={publicKey.toString()} showExplorer={false} className="text-xs text-neutral-400" />
                 )}
               </div>
             </div>

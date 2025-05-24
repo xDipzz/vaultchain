@@ -128,7 +128,7 @@ export function RecoverySetup({ onSetupComplete }: RecoverySetupProps) {
           <div className="space-y-4">
             <div>
               <Label htmlFor="wallet-address">Your Wallet Address</Label>
-              <Input id="wallet-address" value={publicKey || ""} readOnly className="font-mono text-sm" />
+              <Input id="wallet-address" value={publicKey?.toString() || ""} readOnly className="font-mono text-sm" />
               <p className="text-xs text-muted-foreground mt-1">This is the wallet that will be protected.</p>
             </div>
 

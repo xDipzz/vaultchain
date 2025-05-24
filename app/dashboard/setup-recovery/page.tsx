@@ -106,13 +106,13 @@ export default function SetupRecoveryPage() {
       await new Promise(resolve => setTimeout(resolve, 3000))
       
       // Store setup data in localStorage (this will be replaced with blockchain storage)
-      localStorage.setItem(`recovery_setup_${publicKey}`, 'true')
-      localStorage.setItem(`recovery_name_${publicKey}`, recoveryName)
-      localStorage.setItem(`threshold_${publicKey}`, threshold.toString())
-      localStorage.setItem(`checkin_period_${publicKey}`, (checkinPeriod * 24 * 60 * 60).toString()) // Convert to seconds
-      localStorage.setItem(`recovery_delay_${publicKey}`, (recoveryDelay * 24 * 60 * 60).toString()) // Convert to seconds
-      localStorage.setItem(`guardians_${publicKey}`, JSON.stringify(guardians.filter(g => g.isValid).map(g => g.address)))
-      localStorage.setItem(`last_checkin_${publicKey}`, Math.floor(Date.now() / 1000).toString())
+      localStorage.setItem(`recovery_setup_${publicKey.toString()}`, 'true')
+      localStorage.setItem(`recovery_name_${publicKey.toString()}`, recoveryName)
+      localStorage.setItem(`threshold_${publicKey.toString()}`, threshold.toString())
+      localStorage.setItem(`checkin_period_${publicKey.toString()}`, (checkinPeriod * 24 * 60 * 60).toString()) // Convert to seconds
+      localStorage.setItem(`recovery_delay_${publicKey.toString()}`, (recoveryDelay * 24 * 60 * 60).toString()) // Convert to seconds
+      localStorage.setItem(`guardians_${publicKey.toString()}`, JSON.stringify(guardians.filter(g => g.isValid).map(g => g.address)))
+      localStorage.setItem(`last_checkin_${publicKey.toString()}`, Math.floor(Date.now() / 1000).toString())
       
       // Redirect to dashboard
       router.push('/dashboard')
