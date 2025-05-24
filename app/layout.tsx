@@ -3,7 +3,6 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 
-import { ThemeProvider } from "@/components/theme-provider"
 import { SolanaProvider } from "@/components/solana-provider"
 
 const inter = Inter({ subsets: ["latin"] })
@@ -21,14 +20,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <ThemeProvider 
-          defaultTheme="dark" 
-          attribute="class"
-          enableSystem={true}
-          disableTransitionOnChange={false}
-        >
-          <SolanaProvider>{children}</SolanaProvider>
-        </ThemeProvider>
+        <SolanaProvider>{children}</SolanaProvider>
       </body>
     </html>
   )

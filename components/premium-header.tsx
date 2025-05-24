@@ -1,5 +1,6 @@
 "use client"
 
+import React from "react"
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { motion, useScroll, useTransform } from "framer-motion"
@@ -7,7 +8,6 @@ import { Menu, X } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Logo } from "@/components/logo"
-import { ThemeToggle } from "@/components/theme-toggle"
 import { WalletConnectButton } from "@/components/wallet-connect-button"
 import { WalletDisconnectButton } from "@/components/wallet-disconnect-button"
 import { useSolana } from "@/components/solana-provider"
@@ -92,7 +92,6 @@ export function PremiumHeader() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
           >
-            <ThemeToggle />
             {connected ? (
               <>
                 <WalletDisconnectButton size="sm" />

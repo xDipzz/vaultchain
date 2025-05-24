@@ -11,7 +11,6 @@ import { motion } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Logo } from "@/components/logo"
-import { ThemeToggle } from "@/components/theme-toggle"
 import { useSolana } from "@/components/solana-provider"
 
 export function Sidebar() {
@@ -148,10 +147,6 @@ export function Sidebar() {
           </nav>
         </div>
         <div className="flex flex-col gap-2 border-t p-4">
-          <div className="flex items-center justify-between">
-            {expanded && <span className="text-xs font-medium text-muted-foreground">Theme</span>}
-            <ThemeToggle />
-          </div>
           <Button
             variant="outline"
             className={cn("justify-start", !expanded && "flex w-full items-center justify-center p-0 px-0")}

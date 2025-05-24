@@ -853,10 +853,15 @@ export default function LandingPage() {
                   </a>
 
                   <div className="flex items-center gap-6 text-sm text-neutral-400">
-                    <div className="flex items-center gap-2">
+                    <a 
+                      href="https://github.com/xDipzz/vaultchain" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 hover:text-white transition-colors duration-300"
+                    >
                       <Star className="w-4 h-4" />
                       <span>Star the repo</span>
-                    </div>
+                    </a>
                     <div className="flex items-center gap-2">
                       <Code className="w-4 h-4" />
                       <span>MIT License</span>
@@ -945,8 +950,6 @@ export default function LandingPage() {
                 links: [
                   { name: "Discord", href: "#" },
                   { name: "Twitter", href: "#" },
-                  { name: "Telegram", href: "#" },
-                  { name: "GitHub Discussions", href: "https://github.com/xDipzz/vaultchain/discussions" },
                 ],
               },
             ].map((section) => (
