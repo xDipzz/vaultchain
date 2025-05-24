@@ -24,7 +24,7 @@ export default function LandingPage() {
       await connect()
     } else {
       setIsRedirecting(true)
-      window.location.href = "/dashboard"
+      // Navigation will be handled by the Link component wrapping this button
     }
   }
 
@@ -101,7 +101,7 @@ export default function LandingPage() {
                       </SophisticatedButton>
                     </Link>
                   ) : (
-                    <WalletConnectButton size="lg" onConnect={() => (window.location.href = "/dashboard")} />
+                    <WalletConnectButton size="lg" redirectToDashboard={true} />
                   )}
                   <a href="#features">
                   <SophisticatedButton variant="secondary" size="lg">
@@ -791,7 +791,7 @@ export default function LandingPage() {
                       </SophisticatedButton>
                     </Link>
                   ) : (
-                    <WalletConnectButton size="lg" onConnect={() => (window.location.href = "/dashboard")} />
+                    <WalletConnectButton size="lg" redirectToDashboard={true} />
                   )}
                   <SophisticatedButton variant="secondary" size="lg">
                     Learn More

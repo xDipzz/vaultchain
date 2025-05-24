@@ -3,6 +3,7 @@
 import type React from "react"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { useRecoveryProgram } from "@/lib/program-hooks"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -17,6 +18,7 @@ interface RecoverySetupProps {
 export function RecoverySetup({ onSetupComplete }: RecoverySetupProps) {
   const { publicKey } = useSolana()
   const { initializeRecoverySystem, loading, error } = useRecoveryProgram()
+  const router = useRouter()
 
   const [guardians, setGuardians] = useState<string[]>(["", "", ""])
   const [threshold, setThreshold] = useState(2)
@@ -107,7 +109,7 @@ export function RecoverySetup({ onSetupComplete }: RecoverySetupProps) {
           </div>
         </CardContent>
         <CardFooter>
-          <Button onClick={() => (window.location.href = "/dashboard")} className="w-full">
+          <Button onClick={() => router.push("/dashboard")} className="w-full">
             Go to Dashboard
           </Button>
         </CardFooter>

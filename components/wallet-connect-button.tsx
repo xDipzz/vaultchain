@@ -4,6 +4,7 @@ import { motion } from "framer-motion"
 import { Wallet, CheckCircle } from "lucide-react"
 import { useWallet } from "@solana/wallet-adapter-react"
 import type { WalletName } from "@solana/wallet-adapter-base"
+import { useRouter } from "next/navigation"
 
 import { SophisticatedButton } from "@/components/sophisticated-button"
 import { useSolana } from "@/components/solana-provider"
@@ -14,11 +15,13 @@ interface WalletConnectButtonProps {
   size?: "sm" | "md" | "lg"
   className?: string
   onConnect?: () => void
+  redirectToDashboard?: boolean
 }
 
-export function WalletConnectButton({ size = "md", className = "", onConnect }: WalletConnectButtonProps) {
+export function WalletConnectButton({ size = "md", className = "", onConnect, redirectToDashboard = false }: WalletConnectButtonProps) {
   const { connected, connecting } = useSolana()
   const { wallet, connect } = useWallet()
+  const router = useRouter()
   const [showWalletModal, setShowWalletModal] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isConnecting, setIsConnecting] = useState(false)
@@ -50,8 +53,16 @@ export function WalletConnectButton({ size = "md", className = "", onConnect }: 
       // Now attempt to connect
       await connect()
 
+      // Wait a bit for connection to fully establish
+      await new Promise((resolve) => setTimeout(resolve, 500))
+
       if (onConnect) {
         onConnect()
+      }
+
+      // Redirect to dashboard if requested
+      if (redirectToDashboard) {
+        router.push("/dashboard")
       }
     } catch (err) {
       console.error("Connection error:", err)
