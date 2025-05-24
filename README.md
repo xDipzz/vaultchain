@@ -1,36 +1,127 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# VaultChain - Solana Wallet Recovery System
 
-## Getting Started
+A comprehensive Solana wallet recovery solution built with Next.js 14, TypeScript, and ShadCN UI components.
 
-First, run the development server:
+## 🚀 Features
 
+- **Social Recovery System**: Secure wallet recovery using trusted guardians
+- **Multi-Wallet Support**: Compatible with Phantom, Solflare, and other Solana wallets
+- **Beautiful UI**: Modern, responsive interface built with ShadCN components
+- **Dark/Light Theme**: Full theme support with next-themes
+- **Animated Components**: Smooth animations with Framer Motion
+- **Dashboard Interface**: Complete wallet management dashboard
+- **Guardian Management**: Easy setup and management of recovery guardians
+- **Transaction Monitoring**: Real-time transaction tracking and notifications
+
+## 🛠 Tech Stack
+
+- **Framework**: Next.js 14 (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **UI Components**: ShadCN UI
+- **Animations**: Framer Motion
+- **Blockchain**: Solana Web3.js & Wallet Adapter
+- **Theme**: next-themes for dark/light mode
+- **Icons**: Lucide React
+
+## 📦 Installation & Setup
+
+1. **Clone and install dependencies:**
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. **Start the development server:**
+```bash
+npm run dev
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. **Open your browser:**
+Navigate to [http://localhost:3000](http://localhost:3000)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🎯 Component Structure
 
-## Learn More
+The project includes a comprehensive set of components imported from v0.dev:
 
-To learn more about Next.js, take a look at the following resources:
+### 📱 Pages
+- **Landing Page** (`app/page.tsx`) - Beautiful hero section with wallet connection
+- **Dashboard** (`app/dashboard/page.tsx`) - Main wallet overview
+- **Recovery Setup** (`app/dashboard/setup-recovery/page.tsx`) - Guardian configuration
+- **Guardian Management** (`app/dashboard/guardians/page.tsx`) - Manage trusted contacts
+- **Recovery Process** (`app/dashboard/recovery/page.tsx`) - Wallet recovery interface
+- **Settings** (`app/dashboard/settings/page.tsx`) - Wallet and security settings
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 🎨 UI Components
+- **Sophisticated Background** - Animated gradient backgrounds
+- **Interactive Elements** - Mouse tracking and dynamic animations
+- **Theme Support** - Complete dark/light theme system
+- **Wallet Integration** - Solana wallet connection components
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 🔐 Solana Integration
+- **Wallet Adapter** - Multi-wallet support (Phantom, Solflare, etc.)
+- **Provider Setup** - Solana network configuration
+- **Program Integration** - Smart contract interaction (Anchor-based)
 
-## Deploy on Vercel
+## 🌟 Key Features
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 🛡️ Recovery System
+- Set up trusted guardians for wallet recovery
+- Configure recovery thresholds and delays
+- Social recovery without seed phrase exposure
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 💼 Dashboard
+- Wallet balance and transaction history
+- Guardian status monitoring
+- Security settings and 2FA management
+- Device management and login history
+
+### 🎨 Design System
+- Modern glassmorphism design
+- Animated components and backgrounds
+- Responsive layout for all devices
+- Accessible UI with proper contrast
+
+## 🔧 Development
+
+### Available Scripts
+```bash
+npm run dev      # Start development server
+npm run build    # Build for production
+npm run start    # Start production server
+npm run lint     # Run ESLint
+```
+
+### Project Structure
+```
+app/
+├── dashboard/           # Dashboard pages
+├── globals.css         # Global styles
+├── layout.tsx          # Root layout
+└── page.tsx            # Landing page
+
+components/
+├── ui/                 # ShadCN UI components
+├── dashboard-*         # Dashboard specific components
+├── wallet-*            # Wallet integration components
+└── theme-provider.tsx  # Theme management
+```
+
+## 📝 Environment Setup
+
+No additional environment variables required for local development. The app connects to Solana devnet by default.
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+---
+
+Built with ❤️ using Next.js, ShadCN, and Solana Web3.js
