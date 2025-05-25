@@ -80,6 +80,7 @@ export default function SettingsPage() {
                   <option>Central Time (UTC-06:00)</option>
                   <option>Eastern Time (UTC-05:00)</option>
                   <option>UTC</option>
+                  <option>India Standard Time (UTC+05:30)</option>
                 </select>
               </div>
             </CardContent>
