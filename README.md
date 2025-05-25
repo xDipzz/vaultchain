@@ -111,52 +111,6 @@ vaultchain/
 
 This project will be fully open-sourced. Current areas for contribution:
 
-### Security & Auditing
-- Smart contract security review
-- Economic attack vector analysis
-- Guardian system edge case testing
-
-### Development
-- SPL token support beyond SOL
-- Multi-chain recovery mechanisms
-- Guardian notification system
-- Mobile wallet integration
-
-### Documentation
-- Integration guides for other wallets
-- Guardian setup tutorials
-- Security best practices
-
-### Getting Started
-
-1. Fork the repository
-2. Create a feature branch
-3. Run tests locally
-4. Submit pull requests with detailed descriptions
-
-## Security Considerations
-
-**Current Limitations**
-- Unaudited smart contracts
-- Limited to SOL transfers
-- Guardian system requires manual coordination
-
-**Built-in Protections**
-- Multi-signature requirements
-- Time-locked recovery delays
-- User cancellation mechanisms
-- On-chain verification of all operations
-
-## Roadmap
-
-**Phase 1**: Core recovery system (current)
-**Phase 2**: SPL token support and enhanced security
-**Phase 3**: Guardian tooling and notifications
-**Phase 4**: Audit and production deployment
-
-## License
-
-MIT License - see [LICENSE](LICENSE) for details.
 
 ## Contact
 
