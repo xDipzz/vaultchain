@@ -10,6 +10,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { useSolana } from "@/components/solana-provider"
+import { ArrowRight, Shield } from "lucide-react"
+import { SophisticatedButton } from "@/components/sophisticated-button"
 
 interface RecoverySetupProps {
   onSetupComplete?: (recoveryAccountId: string) => void
@@ -109,9 +111,10 @@ export function RecoverySetup({ onSetupComplete }: RecoverySetupProps) {
           </div>
         </CardContent>
         <CardFooter>
-          <Button onClick={() => router.push("/dashboard")} className="w-full">
+          <SophisticatedButton onClick={() => router.push("/dashboard")} className="w-full" size="lg">
+            <ArrowRight className="mr-2 h-4 w-4" />
             Go to Dashboard
-          </Button>
+          </SophisticatedButton>
         </CardFooter>
       </Card>
     )
@@ -159,9 +162,14 @@ export function RecoverySetup({ onSetupComplete }: RecoverySetupProps) {
               </Button>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="threshold">Recovery Threshold</Label>
-              <div className="flex items-center gap-2">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="threshold" className="text-base font-medium">Recovery Threshold</Label>
+                <div className="bg-purple-600/20 border border-purple-500/30 rounded-lg px-3 py-1">
+                  <span className="text-sm font-medium text-purple-300">{threshold} guardians</span>
+                </div>
+              </div>
+              <div className="relative">
                 <Input
                   id="threshold"
                   type="range"
@@ -169,15 +177,25 @@ export function RecoverySetup({ onSetupComplete }: RecoverySetupProps) {
                   max={Math.max(guardians.length, 1)}
                   value={threshold}
                   onChange={(e) => setThreshold(Number.parseInt(e.target.value))}
+                  className="w-full"
                 />
-                <span className="w-8 text-center">{threshold}</span>
+                <div className="flex justify-between text-xs text-muted-foreground mt-2">
+                  <span>1</span>
+                  {guardians.length > 2 && <span>{Math.ceil(guardians.length/2)}</span>}
+                  {guardians.length > 1 && <span>{guardians.length}</span>}
+                </div>
               </div>
               <p className="text-xs text-muted-foreground">Number of guardians required to recover your wallet.</p>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="checkin-period">Check-in Period (days)</Label>
-              <div className="flex items-center gap-2">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="checkin-period" className="text-base font-medium">Check-in Period</Label>
+                <div className="bg-blue-600/20 border border-blue-500/30 rounded-lg px-3 py-1">
+                  <span className="text-sm font-medium text-blue-300">{checkinPeriod} days</span>
+                </div>
+              </div>
+              <div className="relative">
                 <Input
                   id="checkin-period"
                   type="range"
@@ -185,15 +203,26 @@ export function RecoverySetup({ onSetupComplete }: RecoverySetupProps) {
                   max={90}
                   value={checkinPeriod}
                   onChange={(e) => setCheckinPeriod(Number.parseInt(e.target.value))}
+                  className="w-full"
                 />
-                <span className="w-8 text-center">{checkinPeriod}</span>
+                <div className="flex justify-between text-xs text-muted-foreground mt-2">
+                  <span>7d</span>
+                  <span>30d</span>
+                  <span>60d</span>
+                  <span>90d</span>
+                </div>
               </div>
               <p className="text-xs text-muted-foreground">How often you need to check in to confirm wallet access.</p>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="recovery-delay">Recovery Delay (days)</Label>
-              <div className="flex items-center gap-2">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="recovery-delay" className="text-base font-medium">Recovery Delay</Label>
+                <div className="bg-orange-600/20 border border-orange-500/30 rounded-lg px-3 py-1">
+                  <span className="text-sm font-medium text-orange-300">{recoveryDelay} days</span>
+                </div>
+              </div>
+              <div className="relative">
                 <Input
                   id="recovery-delay"
                   type="range"
@@ -201,8 +230,14 @@ export function RecoverySetup({ onSetupComplete }: RecoverySetupProps) {
                   max={7}
                   value={recoveryDelay}
                   onChange={(e) => setRecoveryDelay(Number.parseInt(e.target.value))}
+                  className="w-full"
                 />
-                <span className="w-8 text-center">{recoveryDelay}</span>
+                <div className="flex justify-between text-xs text-muted-foreground mt-2">
+                  <span>1d</span>
+                  <span>3d</span>
+                  <span>5d</span>
+                  <span>7d</span>
+                </div>
               </div>
               <p className="text-xs text-muted-foreground">
                 Waiting period before recovery is completed. This gives you time to cancel if unauthorized.
@@ -218,9 +253,10 @@ export function RecoverySetup({ onSetupComplete }: RecoverySetupProps) {
         </form>
       </CardContent>
       <CardFooter>
-        <Button onClick={handleSubmit} disabled={loading || isSubmitting || !publicKey} className="w-full">
+        <SophisticatedButton onClick={() => handleSubmit({ preventDefault: () => {} } as React.FormEvent)} disabled={loading || isSubmitting || !publicKey} className="w-full" size="lg">
+          <Shield className="mr-2 h-4 w-4" />
           {isSubmitting ? "Setting Up..." : "Deploy Recovery System"}
-        </Button>
+        </SophisticatedButton>
       </CardFooter>
     </Card>
   )

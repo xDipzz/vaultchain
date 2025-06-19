@@ -4,7 +4,6 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { ArrowLeft, ArrowRight, CheckCircle, Shield, Users } from "lucide-react"
-import { motion, AnimatePresence } from "framer-motion"
 import { useWallet } from "@solana/wallet-adapter-react"
 
 import { Button } from "@/components/ui/button"
@@ -15,23 +14,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { DashboardHeader } from "@/components/dashboard-header"
 import { DashboardShell } from "@/components/dashboard-shell"
 import { useSolana } from "@/components/solana-provider"
+import { SophisticatedButton } from "@/components/sophisticated-button"
 
 interface Guardian {
   id: string
   address: string
   isValid: boolean
-}
-
-// Animation variants
-const stepVariants = {
-  hidden: { opacity: 0, x: 50 },
-  visible: { opacity: 1, x: 0 },
-  exit: { opacity: 0, x: -50 }
-}
-
-const fadeInUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0 }
 }
 
 export default function SetupRecoveryPage() {
@@ -186,7 +174,7 @@ export default function SetupRecoveryPage() {
             </TabsList>
             
             <TabsContent value="step1" className="space-y-4 pt-6">
-              <div className="space-y-2">
+              <div className="space-y-2 transform transition-all duration-300 animate-in slide-in-from-right-4">
                 <h3 className="text-lg font-medium">Connect Your Wallet</h3>
                 <p className="text-sm text-muted-foreground">
                   First, let's set up the recovery system for your connected Solana wallet.
@@ -197,250 +185,270 @@ export default function SetupRecoveryPage() {
                   <Label htmlFor="wallet-address">Your Wallet Address</Label>
                   <Input 
                     id="wallet-address" 
-                    value={publicKey ? `${publicKey.toString().slice(0, 8)}...${publicKey.toString().slice(-8)}` : ""} 
+                    value={publicKey?.toString() || ""} 
                     readOnly 
+                    className="font-mono text-sm"
                   />
                   <p className="text-xs text-muted-foreground">This is the wallet that will be protected.</p>
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="recovery-name">Recovery System Name</Label>
                   <Input 
-                    id="recovery-name" 
-                    placeholder="My Wallet Recovery" 
+                    id="recovery-name"
+                    placeholder="e.g., My Main Wallet Recovery"
                     value={recoveryName}
                     onChange={(e) => setRecoveryName(e.target.value)}
                   />
-                  <p className="text-xs text-muted-foreground">
-                    Choose a name to help you identify this recovery system.
-                  </p>
+                  <p className="text-xs text-muted-foreground">Give your recovery system a memorable name.</p>
                 </div>
               </div>
               <div className="flex justify-end">
-                <Button onClick={nextStep} disabled={!isStep1Valid}>
+                <SophisticatedButton 
+                  onClick={nextStep} 
+                  disabled={!isStep1Valid}
+                >
                   Continue to Security
                   <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
+                </SophisticatedButton>
               </div>
             </TabsContent>
-            
+
             <TabsContent value="step2" className="space-y-4 pt-6">
-              <div className="space-y-2">
+              <div className="space-y-2 transform transition-all duration-300 animate-in slide-in-from-right-4">
                 <h3 className="text-lg font-medium">Security Settings</h3>
                 <p className="text-sm text-muted-foreground">
-                  Configure the security features for your recovery system.
+                  Configure how many guardians you need and your check-in frequency.
                 </p>
               </div>
               <div className="grid gap-6 py-4">
-                <div className="grid gap-2">
+                <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="recovery-threshold">Recovery Threshold</Label>
-                    <span className="text-sm text-muted-foreground">{threshold} guardians</span>
+                    <Label htmlFor="threshold" className="text-base font-medium">Recovery Threshold</Label>
+                    <div className="bg-purple-600/20 border border-purple-500/30 rounded-lg px-3 py-1">
+                      <span className="text-sm font-medium text-purple-300">{threshold} guardians</span>
+                    </div>
                   </div>
-                  <Input 
-                    id="recovery-threshold" 
-                    type="range" 
-                    min="2" 
-                    max="5" 
-                    value={threshold}
-                    onChange={(e) => setThreshold(parseInt(e.target.value))}
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Number of guardians required to recover your wallet. We recommend at least 2 for optimal security.
-                  </p>
+                  <div className="relative">
+                    <Input
+                      id="threshold"
+                      type="range"
+                      min={2}
+                      max={5}
+                      value={threshold}
+                      onChange={(e) => setThreshold(Number.parseInt(e.target.value))}
+                      className="w-full"
+                    />
+                    <div className="flex justify-between text-xs text-muted-foreground mt-2">
+                      <span>2</span>
+                      <span>3</span>
+                      <span>4</span>
+                      <span>5</span>
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Number of guardians required to recover your wallet.</p>
                 </div>
-                <div className="grid gap-2">
+
+                <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="check-in-period">Check-in Period</Label>
-                    <span className="text-sm text-muted-foreground">{checkinPeriod} days</span>
+                    <Label htmlFor="checkin-period" className="text-base font-medium">Check-in Period</Label>
+                    <div className="bg-blue-600/20 border border-blue-500/30 rounded-lg px-3 py-1">
+                      <span className="text-sm font-medium text-blue-300">{checkinPeriod} days</span>
+                    </div>
                   </div>
-                  <Input 
-                    id="check-in-period" 
-                    type="range" 
-                    min="7" 
-                    max="90" 
-                    value={checkinPeriod}
-                    onChange={(e) => setCheckinPeriod(parseInt(e.target.value))}
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    How often you need to check in to confirm wallet access. If you miss a check-in, recovery options
-                    become available.
-                  </p>
+                  <div className="relative">
+                    <Input
+                      id="checkin-period"
+                      type="range"
+                      min={7}
+                      max={90}
+                      value={checkinPeriod}
+                      onChange={(e) => setCheckinPeriod(Number.parseInt(e.target.value))}
+                      className="w-full"
+                    />
+                    <div className="flex justify-between text-xs text-muted-foreground mt-2">
+                      <span>7d</span>
+                      <span>30d</span>
+                      <span>60d</span>
+                      <span>90d</span>
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground">How often you need to check in to confirm wallet access.</p>
                 </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="recovery-delay">Recovery Delay</Label>
-                  <Input 
-                    id="recovery-delay" 
-                    type="range" 
-                    min="1" 
-                    max="7" 
-                    value={recoveryDelay}
-                    onChange={(e) => setRecoveryDelay(parseInt(e.target.value))}
-                  />
+
+                <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <p className="text-xs text-muted-foreground">
-                      Waiting period before recovery is completed. This gives you time to cancel if unauthorized.
-                    </p>
-                    <span className="text-sm text-muted-foreground">{recoveryDelay} days</span>
+                    <Label htmlFor="recovery-delay" className="text-base font-medium">Recovery Delay</Label>
+                    <div className="bg-orange-600/20 border border-orange-500/30 rounded-lg px-3 py-1">
+                      <span className="text-sm font-medium text-orange-300">{recoveryDelay} days</span>
+                    </div>
                   </div>
+                  <div className="relative">
+                    <Input
+                      id="recovery-delay"
+                      type="range"
+                      min={1}
+                      max={7}
+                      value={recoveryDelay}
+                      onChange={(e) => setRecoveryDelay(Number.parseInt(e.target.value))}
+                      className="w-full"
+                    />
+                    <div className="flex justify-between text-xs text-muted-foreground mt-2">
+                      <span>1d</span>
+                      <span>3d</span>
+                      <span>5d</span>
+                      <span>7d</span>
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Waiting period before recovery is completed. This gives you time to cancel if unauthorized.
+                  </p>
                 </div>
               </div>
               <div className="flex justify-between">
-                <Button variant="outline" onClick={prevStep}>
+                <SophisticatedButton 
+                  onClick={prevStep} 
+                  variant="ghost"
+                >
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   Back
-                </Button>
-                <Button onClick={nextStep} disabled={!isStep2Valid}>
+                </SophisticatedButton>
+                <SophisticatedButton 
+                  onClick={nextStep} 
+                  disabled={!isStep2Valid}
+                >
                   Continue to Guardians
                   <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
+                </SophisticatedButton>
               </div>
             </TabsContent>
-            
+
             <TabsContent value="step3" className="space-y-4 pt-6">
-              <div className="space-y-2">
-                <h3 className="text-lg font-medium">Add Recovery Guardians</h3>
+              <div className="space-y-2 transform transition-all duration-300 animate-in slide-in-from-right-4">
+                <h3 className="text-lg font-medium">Guardian Setup</h3>
                 <p className="text-sm text-muted-foreground">
-                  Select trusted friends, family members, or DAOs who can help recover your wallet if needed.
+                  Add trusted contacts who can help recover your wallet. You need at least {threshold} guardians.
                 </p>
               </div>
-              <div className="grid gap-6 py-4">
-                <div className="grid gap-4">
+              <div className="grid gap-4 py-4">
+                <div className="space-y-4">
                   {guardians.map((guardian, index) => (
-                    <div key={guardian.id} className="rounded-lg border p-4">
-                      <div className="flex items-start justify-between">
-                        <div className="space-y-2 flex-1">
-                          <div className="flex items-center gap-2">
-                            <Users className="h-4 w-4 text-primary" />
-                            <h4 className="font-medium">Guardian #{index + 1}</h4>
-                            {guardian.isValid && <CheckCircle className="h-4 w-4 text-green-500" />}
-                          </div>
-                          <div className="grid gap-1">
-                            <Label htmlFor={`guardian-${guardian.id}-address`}>Solana Address</Label>
-                            <Input 
-                              id={`guardian-${guardian.id}-address`} 
-                              placeholder="Enter Solana wallet address" 
-                              value={guardian.address}
-                              onChange={(e) => updateGuardianAddress(guardian.id, e.target.value)}
-                              className={guardian.address && !guardian.isValid ? "border-red-500" : ""}
-                            />
-                            {guardian.address && !guardian.isValid && (
-                              <p className="text-xs text-red-500">Invalid Solana address</p>
-                            )}
-                          </div>
-                        </div>
-                        {guardians.length > 3 && (
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            onClick={() => removeGuardian(guardian.id)}
-                            className="ml-2"
-                          >
-                            Remove
-                          </Button>
+                    <div key={guardian.id} className="flex gap-2">
+                      <div className="flex-1">
+                        <Input
+                          placeholder={`Guardian ${index + 1} Solana address`}
+                          value={guardian.address}
+                          onChange={(e) => updateGuardianAddress(guardian.id, e.target.value)}
+                          className={`font-mono text-sm ${guardian.address && !guardian.isValid ? 'border-red-500' : guardian.isValid ? 'border-green-500' : ''}`}
+                        />
+                        {guardian.address && !guardian.isValid && (
+                          <p className="text-xs text-red-400 mt-1">Invalid Solana address</p>
                         )}
                       </div>
+                      {guardians.length > 3 && (
+                        <Button 
+                          variant="outline" 
+                          size="icon"
+                          onClick={() => removeGuardian(guardian.id)}
+                        >
+                          ✕
+                        </Button>
+                      )}
                     </div>
                   ))}
-                  {guardians.length < 5 && (
-                    <Button variant="outline" className="w-full" onClick={addGuardian}>
+                  
+                  {guardians.length < 10 && (
+                    <SophisticatedButton 
+                      onClick={addGuardian} 
+                      variant="secondary" 
+                      className="w-full"
+                    >
                       <Users className="mr-2 h-4 w-4" />
                       Add Another Guardian
-                    </Button>
+                    </SophisticatedButton>
                   )}
                 </div>
-                <div className="text-sm text-muted-foreground">
-                  You need at least {threshold} valid guardian addresses to proceed.
-                  Currently: {guardians.filter(g => g.isValid).length}/{threshold}
-                </div>
               </div>
               <div className="flex justify-between">
-                <Button variant="outline" onClick={prevStep}>
+                <SophisticatedButton 
+                  onClick={prevStep} 
+                  variant="ghost"
+                >
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   Back
-                </Button>
-                <Button onClick={nextStep} disabled={!isStep3Valid}>
-                  Continue to Confirm
+                </SophisticatedButton>
+                <SophisticatedButton 
+                  onClick={nextStep} 
+                  disabled={!isStep3Valid}
+                >
+                  Review & Deploy
                   <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
+                </SophisticatedButton>
               </div>
             </TabsContent>
-            
+
             <TabsContent value="step4" className="space-y-4 pt-6">
-              <div className="space-y-2">
-                <h3 className="text-lg font-medium">Confirm Recovery Setup</h3>
-                <p className="text-sm text-muted-foreground">Review your recovery system settings before finalizing.</p>
+              <div className="space-y-2 transform transition-all duration-300 animate-in slide-in-from-right-4">
+                <h3 className="text-lg font-medium">Review & Deploy</h3>
+                <p className="text-sm text-muted-foreground">
+                  Review your recovery system configuration before deployment.
+                </p>
               </div>
-              <div className="grid gap-6 py-4">
-                <div className="rounded-lg border p-4 space-y-4">
-                  <div className="space-y-1">
-                    <h4 className="font-medium">Wallet Details</h4>
-                    <div className="grid grid-cols-2 gap-2 text-sm">
-                      <div className="text-muted-foreground">Protected Wallet:</div>
-                      <div>{publicKey ? `${publicKey.toString().slice(0, 8)}...${publicKey.toString().slice(-8)}` : ""}</div>
-                      <div className="text-muted-foreground">Recovery Name:</div>
-                      <div>{recoveryName}</div>
-                    </div>
+              <div className="grid gap-4 py-4">
+                <div className="rounded-lg border p-4 space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-sm font-medium">Recovery Name:</span>
+                    <span className="text-sm">{recoveryName}</span>
                   </div>
-                  <div className="space-y-1">
-                    <h4 className="font-medium">Security Settings</h4>
-                    <div className="grid grid-cols-2 gap-2 text-sm">
-                      <div className="text-muted-foreground">Recovery Threshold:</div>
-                      <div>{threshold} guardians</div>
-                      <div className="text-muted-foreground">Check-in Period:</div>
-                      <div>{checkinPeriod} days</div>
-                      <div className="text-muted-foreground">Recovery Delay:</div>
-                      <div>{recoveryDelay} days</div>
-                    </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm font-medium">Wallet:</span>
+                    <span className="text-sm font-mono">{publicKey?.toString().slice(0, 8)}...{publicKey?.toString().slice(-8)}</span>
                   </div>
-                  <div className="space-y-1">
-                    <h4 className="font-medium">Guardians ({guardians.filter(g => g.isValid).length})</h4>
-                    <div className="grid gap-2 text-sm">
-                      {guardians.filter(g => g.isValid).map((guardian, index) => (
-                        <div key={guardian.id} className="flex items-center gap-2">
-                          <CheckCircle className="h-4 w-4 text-green-500" />
-                          <span>{guardian.address.slice(0, 8)}...{guardian.address.slice(-8)}</span>
-                        </div>
-                      ))}
-                    </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm font-medium">Threshold:</span>
+                    <span className="text-sm">{threshold} of {guardians.filter(g => g.isValid).length} guardians</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm font-medium">Check-in Period:</span>
+                    <span className="text-sm">{checkinPeriod} days</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm font-medium">Recovery Delay:</span>
+                    <span className="text-sm">{recoveryDelay} days</span>
                   </div>
                 </div>
-                <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-900 dark:bg-amber-950">
-                  <div className="flex items-start gap-2">
-                    <Shield className="mt-0.5 h-5 w-5 text-amber-600 dark:text-amber-400" />
-                    <div className="space-y-1">
-                      <h4 className="font-medium text-amber-800 dark:text-amber-300">Important Security Notice</h4>
-                      <p className="text-sm text-amber-700 dark:text-amber-400">
-                        Once deployed, your recovery system will be secured by your guardians. Make sure they are people
-                        or DAOs you trust completely. You will need their help if you ever lose access to your wallet.
-                      </p>
-                    </div>
+                
+                <div className="rounded-lg border p-4">
+                  <h4 className="text-sm font-medium mb-2">Guardians ({guardians.filter(g => g.isValid).length})</h4>
+                  <div className="space-y-2">
+                    {guardians.filter(g => g.isValid).map((guardian, index) => (
+                      <div key={guardian.id} className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-green-500" />
+                        <span className="text-sm font-mono">{guardian.address}</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
               <div className="flex justify-between">
-                <Button variant="outline" onClick={prevStep}>
+                <SophisticatedButton 
+                  onClick={prevStep} 
+                  variant="ghost"
+                >
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   Back
-                </Button>
-                <Button onClick={deployRecoverySystem} disabled={!isStep4Valid || isDeploying}>
+                </SophisticatedButton>
+                <SophisticatedButton 
+                  onClick={deployRecoverySystem} 
+                  disabled={!isStep4Valid || isDeploying}
+                  size="lg"
+                >
                   <Shield className="mr-2 h-4 w-4" />
-                  {isDeploying ? "Deploying..." : "Deploy Recovery Program"}
-                </Button>
+                  {isDeploying ? "Deploying..." : "Deploy Recovery System"}
+                </SophisticatedButton>
               </div>
             </TabsContent>
           </Tabs>
         </CardContent>
-        <CardFooter className="border-t px-6 py-4">
-          <div className="flex items-center justify-between w-full">
-            <div className="flex items-center gap-2">
-              <Shield className="h-5 w-5 text-primary" />
-              <span className="text-sm font-medium">Solana-powered social recovery system</span>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              Step {currentStep === "step1" ? "1" : currentStep === "step2" ? "2" : currentStep === "step3" ? "3" : "4"} of 4
-            </p>
-          </div>
-        </CardFooter>
       </Card>
     </DashboardShell>
   )
