@@ -312,31 +312,62 @@ export default function SettingsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="recovery-threshold">Guardian Recovery Threshold</Label>
-                <div className="flex items-center gap-2">
-                  <Input id="recovery-threshold" type="range" min="2" max="5" defaultValue="3" />
-                  <span className="w-12 text-center">3</span>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="recovery-threshold" className="text-base font-medium">Guardian Recovery Threshold</Label>
+                  <div className="bg-purple-600/20 border border-purple-500/30 rounded-lg px-3 py-1">
+                    <span className="text-sm font-medium text-purple-300">3 guardians</span>
+                  </div>
+                </div>
+                <div className="relative">
+                  <Input id="recovery-threshold" type="range" min="2" max="5" defaultValue="3" className="w-full" />
+                  <div className="flex justify-between text-xs text-muted-foreground mt-2">
+                    <span>2</span>
+                    <span>3</span>
+                    <span>4</span>
+                    <span>5</span>
+                  </div>
                 </div>
                 <p className="text-xs text-muted-foreground">
                   Number of guardians required to recover your wallet.
                 </p>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="recovery-delay">Recovery Delay Period</Label>
-                <div className="flex items-center gap-2">
-                  <Input id="recovery-delay" type="range" min="1" max="7" defaultValue="3" />
-                  <span className="w-12 text-center">3d</span>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="recovery-delay" className="text-base font-medium">Recovery Delay Period</Label>
+                  <div className="bg-orange-600/20 border border-orange-500/30 rounded-lg px-3 py-1">
+                    <span className="text-sm font-medium text-orange-300">3d</span>
+                  </div>
+                </div>
+                <div className="relative">
+                  <Input id="recovery-delay" type="range" min="1" max="7" defaultValue="3" className="w-full" />
+                  <div className="flex justify-between text-xs text-muted-foreground mt-2">
+                    <span>1d</span>
+                    <span>3d</span>
+                    <span>5d</span>
+                    <span>7d</span>
+                  </div>
                 </div>
                 <p className="text-xs text-muted-foreground">
                   Waiting period before recovery is completed. This gives you time to cancel if unauthorized.
                 </p>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="check-in-period">Check-in Period</Label>
-                <div className="flex items-center gap-2">
-                  <Input id="check-in-period" type="range" min="7" max="90" defaultValue="30" />
-                  <span className="w-12 text-center">30d</span>
+              
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="check-in-period" className="text-base font-medium">Check-in Period</Label>
+                  <div className="bg-blue-600/20 border border-blue-500/30 rounded-lg px-3 py-1">
+                    <span className="text-sm font-medium text-blue-300">30d</span>
+                  </div>
+                </div>
+                <div className="relative">
+                  <Input id="check-in-period" type="range" min="7" max="90" defaultValue="30" className="w-full" />
+                  <div className="flex justify-between text-xs text-muted-foreground mt-2">
+                    <span>7d</span>
+                    <span>30d</span>
+                    <span>60d</span>
+                    <span>90d</span>
+                  </div>
                 </div>
                 <p className="text-xs text-muted-foreground">
                   How often you need to check in to verify you still control your wallet.
