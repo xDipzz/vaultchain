@@ -173,7 +173,7 @@ export default function GuardiansPage() {
             <p className="text-neutral-400 mb-6">
               Connect your wallet to manage your recovery guardians.
             </p>
-            <WalletConnectButton size="lg" />
+            <WalletConnectButton />
           </div>
         </div>
       </DashboardShell>
@@ -345,11 +345,16 @@ export default function GuardiansPage() {
           <CardTitle>Guardian Settings</CardTitle>
           <CardDescription>Configure how your guardians help with wallet recovery.</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="threshold">Recovery Threshold</Label>
-              <div className="flex items-center gap-2">
+        <CardContent className="space-y-6">
+          <div className="grid gap-6 md:grid-cols-2">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="threshold" className="text-base font-medium">Recovery Threshold</Label>
+                <div className="bg-purple-600/20 border border-purple-500/30 rounded-lg px-3 py-1">
+                  <span className="text-sm font-medium text-purple-300">{threshold} guardians</span>
+                </div>
+              </div>
+              <div className="relative">
                 <Input 
                   id="threshold" 
                   type="range" 
@@ -357,16 +362,26 @@ export default function GuardiansPage() {
                   max={Math.max(2, guardians.length)} 
                   value={threshold}
                   onChange={(e) => handleThresholdChange(parseInt(e.target.value))}
+                  className="w-full"
                 />
-                <span className="w-12 text-center">{threshold}</span>
+                <div className="flex justify-between text-xs text-muted-foreground mt-2">
+                  <span>2</span>
+                  {guardians.length > 2 && <span>{Math.ceil(guardians.length/2)}</span>}
+                  {guardians.length > 3 && <span>{guardians.length}</span>}
+                </div>
               </div>
               <p className="text-xs text-muted-foreground">
                 Number of guardians required to recover your wallet (out of {guardians.length}).
               </p>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="delay">Recovery Delay</Label>
-              <div className="flex items-center gap-2">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="delay" className="text-base font-medium">Recovery Delay</Label>
+                <div className="bg-orange-600/20 border border-orange-500/30 rounded-lg px-3 py-1">
+                  <span className="text-sm font-medium text-orange-300">{recoveryDelay}d</span>
+                </div>
+              </div>
+              <div className="relative">
                 <Input 
                   id="delay" 
                   type="range" 
@@ -374,8 +389,14 @@ export default function GuardiansPage() {
                   max="7" 
                   value={recoveryDelay}
                   onChange={(e) => handleRecoveryDelayChange(parseInt(e.target.value))}
+                  className="w-full"
                 />
-                <span className="w-12 text-center">{recoveryDelay}d</span>
+                <div className="flex justify-between text-xs text-muted-foreground mt-2">
+                  <span>1d</span>
+                  <span>3d</span>
+                  <span>5d</span>
+                  <span>7d</span>
+                </div>
               </div>
               <p className="text-xs text-muted-foreground">Waiting period before recovery is completed.</p>
             </div>

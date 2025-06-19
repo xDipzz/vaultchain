@@ -180,7 +180,7 @@ export default function LandingPage() {
                       </SophisticatedButton>
                     </Link>
                   ) : (
-                    <WalletConnectButton size="lg" redirectToDashboard={true} />
+                    <WalletConnectButton />
                   )}
                   <SophisticatedButton 
                     variant="secondary" 
@@ -891,7 +891,7 @@ export default function LandingPage() {
                       </SophisticatedButton>
                     </Link>
                   ) : (
-                    <WalletConnectButton size="lg" redirectToDashboard={true} />
+                    <WalletConnectButton />
                   )}
                   <SophisticatedButton variant="secondary" size="lg">
                     Learn More

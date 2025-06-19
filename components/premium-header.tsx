@@ -94,7 +94,7 @@ export function PremiumHeader() {
           >
             {connected ? (
               <>
-                <WalletDisconnectButton size="sm" />
+                <WalletDisconnectButton />
                 <Link href="/dashboard">
                   <Button className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 text-white border border-purple-500 transition-all duration-300 hover:shadow-lg hover:shadow-purple-900/20">
                     Dashboard
@@ -103,7 +103,7 @@ export function PremiumHeader() {
               </>
             ) : (
               <>
-                <WalletConnectButton size="sm" />
+                <WalletConnectButton />
                 <Link href="/dashboard">
                   <Button className="bg-gradient-to-r from-neutral-700 to-neutral-800 hover:from-neutral-600 hover:to-neutral-700 text-white border border-neutral-600 transition-all duration-300 hover:shadow-lg hover:shadow-neutral-900/20">
                     Protect My Wallet
@@ -150,7 +150,7 @@ export function PremiumHeader() {
               {connected ? (
                 <>
                   <div className="px-3">
-                    <WalletDisconnectButton size="sm" className="w-full" />
+                    <WalletDisconnectButton />
                   </div>
                   <Link href="/dashboard" onClick={() => setIsOpen(false)}>
                     <Button className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600">
@@ -161,7 +161,7 @@ export function PremiumHeader() {
               ) : (
                 <>
                   <div className="px-3">
-                    <WalletConnectButton size="sm" className="w-full" />
+                    <WalletConnectButton />
                   </div>
                   <Link href="/dashboard" onClick={() => setIsOpen(false)}>
                     <Button className="w-full bg-gradient-to-r from-neutral-700 to-neutral-800 hover:from-neutral-600 hover:to-neutral-700">

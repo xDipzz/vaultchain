@@ -69,7 +69,7 @@ export default function DashboardPage() {
             <p className="text-neutral-400 mb-6">
               Connect your Phantom or Solflare wallet to set up social recovery protection.
             </p>
-            <WalletConnectButton size="lg" />
+            <WalletConnectButton />
           </div>
         </div>
       </DashboardShell>
